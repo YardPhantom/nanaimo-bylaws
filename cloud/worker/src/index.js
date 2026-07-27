@@ -98,10 +98,11 @@ export default {
       return new Response(null, { status: 200, headers });
     }
 
-    const object = await env.NANAIMO_DATA.get(key, {
-      onlyIf: request.headers,
-      range: request.headers
-    });
+    const getOptions = { onlyIf: request.headers };
+    const hasRangeRequest = request.headers.has("Range");
+    if (hasRangeRequest) getOptions.range = request.headers;
+
+    const object = await env.NANAIMO_DATA.get(key, getOptions);
     if (object === null) return jsonResponse(request, env, { error: "Not found" }, 404);
     if (!('body' in object)) {
       const headers = baseHeaders(request, env, key);
@@ -113,7 +114,7 @@ export default {
     const headers = baseHeaders(request, env, key);
     applyObjectHeaders(headers, object, key);
     let status = 200;
-    if (object.range) {
+    if (hasRangeRequest && object.range) {
       const offset = object.range.offset ?? 0;
       const length = object.range.length ?? object.size;
       headers.set("Content-Range", `bytes ${offset}-${offset + length - 1}/${object.size}`);
