@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<meta content="Search and track City of Nanaimo bylaws, amendments, repeals and consolidations." name="description"/>
+<title>Nanaimo Bylaw Tracker</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg?v=0.13.1">
+  <link rel="alternate icon" type="image/png" href="favicon.png?v=0.13.1">
+
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link rel="preload" href="style.min.css?v=0.13.1" as="style"><link href="style.min.css?v=0.13.1" rel="stylesheet" fetchpriority="high">
+</head>
+<body data-page="home"><div data-root="." data-shared-header></div><script src="cloud-config.js?v=0.13.1"></script><script src="cloud-data.min.js?v=0.13.1"></script><script defer src="shared-header.min.js?v=0.13.1"></script><script defer src="civic-records.min.js?v=0.13.1"></script>
+
+<main>
+<section aria-labelledby="hero-title" class="hero">
+<div aria-hidden="true" class="hero-art">
+<svg preserveaspectratio="xMidYMid slice" viewbox="0 0 1600 560">
+<defs>
+<lineargradient id="sky" x1="0" x2="0" y1="0" y2="1">
+<stop offset="0" stop-color="#e9f7ff"></stop>
+<stop offset=".62" stop-color="#a8d6ec"></stop>
+<stop offset="1" stop-color="#67b4d2"></stop>
+</lineargradient>
+<lineargradient id="water" x1="0" x2="0" y1="0" y2="1">
+<stop offset="0" stop-color="#7cc5df"></stop>
+<stop offset="1" stop-color="#2f86ae"></stop>
+</lineargradient>
+<lineargradient id="mount" x1="0" x2="1" y1="0" y2="1">
+<stop offset="0" stop-color="#93bdd1"></stop>
+<stop offset="1" stop-color="#4d819b"></stop>
+</lineargradient>
+</defs>
+<rect fill="url(#sky)" height="560" width="1600"></rect>
+<g fill="#fff" opacity=".7">
+<ellipse cx="930" cy="92" rx="220" ry="42"></ellipse>
+<ellipse cx="1220" cy="72" rx="170" ry="34"></ellipse>
+</g>
+<path d="M380 285 610 160 760 245 940 130 1115 250 1315 145 1600 252V395H380Z" fill="#b2cad5"></path>
+<path d="M560 320 760 205 920 292 1085 180 1250 278 1420 198 1600 292V420H560Z" fill="url(#mount)"></path>
+<path d="M0 325h1600v235H0z" fill="url(#water)"></path>
+<path d="M900 410c170-22 330-40 700-18v168H960c-55-44-74-94-60-150z" fill="#d5c9ab"></path>
+<path d="M1010 388c164-18 365-18 590 8v52c-260-22-450-11-600 15z" fill="#3c745d"></path>
+<g fill="#245f48">
+<path d="m1110 400 18-70 18 70z"></path><path d="m1160 394 20-84 20 84z"></path>
+<path d="m1220 395 22-92 22 92z"></path><path d="m1300 395 18-78 18 78z"></path>
+<path d="m1380 396 22-93 22 93z"></path><path d="m1460 398 22-86 22 86z"></path>
+</g>
+<g fill="#f6f6f2" stroke="#d0d8dc" stroke-width="2">
+<rect height="62" rx="2" width="92" x="1190" y="320"></rect>
+<rect height="76" rx="2" width="106" x="1296" y="306"></rect>
+<rect height="52" rx="2" width="86" x="1415" y="330"></rect>
+</g>
+<g fill="#63869b">
+<rect height="14" width="14" x="1204" y="335"></rect><rect height="14" width="14" x="1232" y="335"></rect>
+<rect height="14" width="14" x="1260" y="335"></rect><rect height="16" width="16" x="1310" y="322"></rect>
+<rect height="16" width="16" x="1340" y="322"></rect><rect height="16" width="16" x="1370" y="322"></rect>
+<rect height="14" width="14" x="1431" y="344"></rect><rect height="14" width="14" x="1462" y="344"></rect>
+</g>
+</svg>
+</div>
+<div class="hero-shade"></div>
+<div class="hero-content">
+<p class="eyebrow">Independent civic information</p>
+<h1 id="hero-title">Track Nanaimo bylaws<br/>and bylaw changes in one place</h1>
+<p class="hero-copy">Search independent archives exploring current bylaws, amendments, repeals, consolidations, and their source documents — all in one place. The City of Nanaimo publishes only a portion of its historical bylaws, while the third-party eSCRIBE service hosts many City documents from recent years.</p>
+<form action="bylaws/index.html" class="search-panel" id="search-form" role="search">
+<div class="search-field">
+<button class="search-icon-submit" type="submit" aria-label="Search entered text"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="m21 21-4.4-4.4m2.4-5.1A7.5 7.5 0 1 1 4 11.5a7.5 7.5 0 0 1 15 0Z"></path></svg></button>
+<input id="search-input" name="q" aria-label="Search bylaws" placeholder="Search by bylaw name, number, topic, or keyword" type="search"/>
+</div>
+<div aria-label="Search filters" class="filters">
+<button class="filter-button" data-filter="status" type="button">✓ <span>Status</span><b>⌄</b></button>
+<button class="filter-button" data-filter="category" type="button">▱ <span>Category</span><b>⌄</b></button>
+<button class="filter-button" data-filter="year" type="button">▦ <span>Year</span><b>⌄</b></button>
+<button class="filter-button" data-filter="department" type="button">⌂ <span>Department</span><b>⌄</b></button>
+<button class="filter-button" data-filter="source" type="button">▤ <span>Source</span><b>⌄</b></button>
+</div>
+</form>
+</div>
+</section>
+<section class="page-shell">
+<div aria-label="Bylaw statistics" class="stats-grid">
+<a aria-label="Browse all online bylaws" class="stat-card blue" href="bylaws/index.html?view=online">
+<span class="stat-icon">▤</span><div><strong id="stat-online">—</strong><b>online bylaws</b><small>Currently available</small></div>
+</a>
+<a aria-label="Browse locally connected bylaw records" class="stat-card teal" href="bylaws/index.html?view=connected">
+<span class="stat-icon">↻</span><div><strong id="stat-connected">—</strong><b>records connected</b><small>Loading current dataset</small></div>
+</a>
+<a aria-label="Browse amended bylaws" class="stat-card amber" href="bylaws/index.html?view=amended">
+<span class="stat-icon">✎</span><div><strong id="stat-amended">—</strong><b>amendment bylaws</b><small>Explicitly linked to a base bylaw</small></div>
+</a>
+<a aria-label="Browse repealed or replaced bylaws" class="stat-card red" href="bylaws/index.html?view=repealed">
+<span class="stat-icon">×</span><div><strong id="stat-repealed">—</strong><b>repealed or replaced</b><small>Live total identified in collected official records</small></div>
+</a>
+<a aria-label="Browse detected Council items" class="stat-card teal" href="council/index.html">
+<span class="stat-icon">☷</span><div><strong id="stat-council-items">—</strong><b>detected Council items</b><small>Bylaws and motions extracted from records</small></div>
+</a>
+<a aria-label="Browse detected Committee items" class="stat-card blue" href="committees/index.html">
+<span class="stat-icon">▧</span><div><strong id="stat-committee-items">—</strong><b>Committee items</b><small>Recommendations and motions extracted from committee records</small></div>
+</a>
+<a aria-label="Browse indexed Council meetings" class="stat-card amber" href="council/index.html">
+<span class="stat-icon">◫</span><div><strong id="stat-council-meetings">—</strong><b>Council meetings indexed</b><small>Meeting records included in the archive</small></div>
+</a>
+<a aria-label="Browse preserved source PDFs" class="stat-card red" href="council/index.html">
+<span class="stat-icon">⇩</span><div><strong id="stat-archived-pdfs">—</strong><b>archived source PDFs</b><small>Original documents preserved in archive storage</small></div>
+</a>
+</div>
+</div>
+<div class="dashboard-grid">
+<section class="content-column">
+<article class="panel" id="changes">
+<div class="panel-heading latest-council-heading">
+<h2>↻ &nbsp; Recent Bylaw Changes</h2>
+<span class="count" id="recent-change-count" aria-live="polite">Loading…</span>
+<a href="bylaws/index.html">Browse all bylaws <span>›</span></a>
+</div>
+<div class="table-wrap">
+<table class="changes-table">
+<thead>
+<tr><th><button aria-label="Sort by change date newest first" class="table-sort" data-sort="date" type="button">Date <span aria-hidden="true">↓</span></button></th><th><button aria-label="Sort by bylaw number highest to lowest" class="table-sort" data-sort="number" type="button">Bylaw # <span aria-hidden="true">↕</span></button></th><th>Bylaw Title</th><th><button aria-label="Group by status" class="table-sort" data-sort="status" type="button">Status <span aria-hidden="true">↕</span></button></th><th><button aria-label="Group by category" class="table-sort" data-sort="category" type="button">Category <span aria-hidden="true">↕</span></button></th><th></th></tr>
+</thead>
+<tbody id="changes-body"><tr><td colspan="6">Loading actual bylaw changes…</td></tr></tbody>
+</table>
+</div>
+<div class="table-footer">
+<span><i class="dot purple"></i>Amended</span>
+<span><i class="dot green"></i>New</span>
+<span><i class="dot orange"></i>Consolidated</span>
+<span><i class="dot red"></i>Repealed</span>
+<small><span id="dataset-updated">Dataset loading…</span></small>
+</div>
+</article>
+<div class="lower-grid">
+<article class="panel category-panel" id="bylaws">
+<div class="panel-heading latest-council-heading"><h2>▦ &nbsp; Browse Bylaws by Category</h2><span class="count" id="category-bylaw-count" aria-live="polite">Loading…</span></div>
+<div class="category-grid">
+<a data-category="Land Use &amp; Zoning" href="bylaws/index.html?category=Land%20Use%20%26%20Zoning"><span>🗺</span><b>Land Use &amp;<br/>Zoning</b><small><span class="category-count">0</span> bylaws</small></a>
+<a data-category="Transportation" href="bylaws/index.html?category=Transportation"><span>🚙</span><b>Transportation<br/>&amp; Parking</b><small><span class="category-count">0</span> bylaws</small></a>
+<a data-category="Public Safety" href="bylaws/index.html?category=Public%20Safety"><span>🛡</span><b>Public Safety</b><small><span class="category-count">0</span> bylaws</small></a>
+<a data-category="Animals" href="bylaws/index.html?category=Animals"><span>🐾</span><b>Animals</b><small><span class="category-count">0</span> bylaws</small></a>
+<a data-category="Business &amp; Licensing" href="bylaws/index.html?category=Business%20%26%20Licensing"><span>💼</span><b>Business &amp;<br/>Licensing</b><small><span class="category-count">0</span> bylaws</small></a>
+<a data-category="Environment" href="bylaws/index.html?category=Environment"><span>🍃</span><b>Environment</b><small><span class="category-count">0</span> bylaws</small></a>
+<a data-category="Parks &amp; Recreation" href="bylaws/index.html?category=Parks%20%26%20Recreation"><span>🌲</span><b>Parks &amp;<br/>Recreation</b><small><span class="category-count">0</span> bylaws</small></a>
+<a data-category="Administration &amp; Governance" href="bylaws/index.html?category=Administration%20%26%20Governance"><span>🏛️</span><b>Administration &amp;<br/>Governance</b><small><span class="category-count">0</span> bylaws</small></a>
+</div>
+<a class="text-link" href="categories.html">View all categories ›</a>
+</article>
+<article class="panel featured-panel">
+<div class="panel-heading"><h2>▣ &nbsp; Featured Bylaw</h2></div>
+<div class="featured-card">
+<h3><a class="featured-title-link" id="home-featured-title" href="featured.html">Loading featured bylaw…</a></h3>
+<dl>
+<dt>Bylaw Number</dt><dd id="home-featured-number">—</dd>
+<dt>Status</dt><dd><span class="status amended" id="home-featured-status">Loading</span></dd>
+<dt>Discussion Date</dt><dd id="home-featured-date">—</dd>
+<dt>Department</dt><dd id="home-featured-department">—</dd>
+<dt>Stage</dt><dd id="home-featured-stage">—</dd>
+<dt>Tracking</dt><dd id="home-featured-tracking">Automatically selected</dd>
+</dl>
+<div class="button-row">
+<a class="primary-button" id="home-featured-pdf" href="featured.html">▣ View Bylaw</a>
+<a class="secondary-button" id="home-featured-council" href="council/index.html">▤ Council Sources</a>
+</div>
+</div>
+<a class="text-link" href="featured.html">View full bylaw page ›</a>
+</article>
+</div>
+</section>
+<aside class="sidebar">
+<article class="panel side-panel" id="sources">
+<div class="panel-heading latest-council-heading"><h2>▤ &nbsp; Council activity</h2><span class="count council-pdf-count" id="council-pdf-count">— items · — documents</span></div>
+<ul class="document-list" id="council-discussions">
+<li><span>…</span><a href="bylaws/index.html">Loading recent Council discussions…</a></li>
+</ul>
+<a class="center-link underline council-view-all" href="council/index.html">View all documents <span aria-hidden="true">›</span></a>
+</article>
+<article class="panel latest-committee-panel" id="latest-committee-activity">
+<div class="panel-heading latest-council-heading"><h2>◫ &nbsp; Latest Committee and Panel activity</h2><span class="count" id="committee-activity-count">Loading…</span></div>
+<div class="latest-council-list" id="latest-committee-list"><p class="empty-state">Loading committee activity…</p></div>
+<a class="text-link committee-view-all" href="committees/index.html">View all committee activity ›</a>
+</article>
+<article class="panel side-panel" id="watchlist-summary">
+<div class="panel-heading latest-council-heading"><h2>☆ &nbsp; Watchlist</h2><span class="count" id="watchlist-count" aria-live="polite">0</span></div>
+<ul class="simple-list" id="watchlist-preview"><li>No bylaws added yet.</li></ul>
+<a class="secondary-button full" href="watchlist.html">View watchlist</a>
+</article>
+<article class="panel side-panel">
+<div class="panel-heading"><h2>▧ &nbsp; Subscribe to changes</h2></div>
+<p>Sign in with Google to choose private email alerts for new bylaws, amendments, consolidations, repeals, replacements, and Council activity.</p>
+<a class="primary-button full" href="account.html">Manage email alerts</a>
+</article>
+<article class="panel side-panel">
+<div class="panel-heading"><h2>◷ &nbsp; Data updated</h2></div>
+<p>Bylaw data is updated daily.</p>
+<p>Last updated: <span id="data-last-updated">Loading…</span></p>
+<a class="text-link" href="data/index.html">About our data sources ›</a>
+</article>
+</aside>
+</div>
+</section>
+</main>
+<div data-root="." data-shared-footer=""></div>
+<div aria-live="polite" class="toast" id="toast" role="status"></div>
+<script defer src="watchlist-store.min.js?v=0.13.1"></script><script defer src="app.js?v=0.13.1"></script>
+<script defer src="shared-footer.min.js?v=0.13.1"></script></body>
+</html>

@@ -1,0 +1,33 @@
+name: Deploy Nanaimo data Worker
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "cloud/worker/**"
+      - ".github/workflows/deploy-data-worker.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: nanaimo-data-worker-deploy
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Check out project
+        uses: actions/checkout@v7
+
+      - name: Deploy Worker
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: cloud/worker
+          wranglerVersion: "4.114.0"
+          command: deploy

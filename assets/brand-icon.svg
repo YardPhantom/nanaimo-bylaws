@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Nanaimo Bylaw Tracker icon">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#eef9ff"/>
+      <stop offset="0.55" stop-color="#b6ddf2"/>
+      <stop offset="1" stop-color="#6fb3d7"/>
+    </linearGradient>
+    <linearGradient id="water" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2d9ad1"/>
+      <stop offset="1" stop-color="#075f9b"/>
+    </linearGradient>
+    <linearGradient id="mount1" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#8db8ce"/>
+      <stop offset="1" stop-color="#37698d"/>
+    </linearGradient>
+    <linearGradient id="mount2" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#b1d0de"/>
+      <stop offset="1" stop-color="#5d8fae"/>
+    </linearGradient>
+  </defs>
+
+  <rect x="2" y="2" width="60" height="60" rx="14" fill="url(#bg)"/>
+  <path d="M14 31 25 19l8 7 10-11 10 16v12H14z" fill="url(#mount2)"/>
+  <path d="M8 35 20 23l10 9 13-15 13 18v14H8z" fill="url(#mount1)"/>
+  <path d="M20.5 22.5 25 19l2.8 2.6-2.4.6zM39.3 20.8 43 17l2.8 3.6-2.6.3z" fill="#f6fcff" opacity=".95"/>
+  <path d="M2 42c8-2.8 16-1.7 23 .7 7 2.5 13 2.5 20-.1 6.2-2.2 12.2-3 17-.6v9.5H2z" fill="url(#water)"/>
+  <path d="M2 46c7.6-2.1 13.4-1.6 20 .9 7 2.6 13 2.7 20 .2 6.5-2.3 12.8-3.1 20-.8v4.5c-8.2-2.5-14.1-1.7-20.3.6-7.1 2.5-13.4 2.4-20.3-.2-6.2-2.4-11.8-2.9-19.4-.7z" fill="#e6fbff" opacity=".92"/>
+  <path d="M12 39.5c5.5 1 10.5 3.8 16.5 3.8 7 0 11-4.2 18.5-4.2 3.3 0 6.6.6 10.4 2v1.8c-3.2-1-6.2-1.5-9.3-1.5-7.5 0-11.7 4.2-19.2 4.2-6.2 0-11-2.8-16.9-3.8z" fill="#0f7db5" opacity=".78"/>
+  <rect x="2" y="2" width="60" height="60" rx="14" fill="none" stroke="#0a5d93" stroke-opacity=".18"/>
+</svg>

@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Browse collected Nanaimo Council meetings, documents, bylaws and motions.">
+  <title>Council Documents | Nanaimo Bylaw Tracker</title>
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg?v=0.13.1">
+  <link rel="alternate icon" type="image/png" href="../favicon.png?v=0.13.1">
+
+  <link rel="preload" href="../style.min.css?v=0.13.1" as="style"><link rel="stylesheet" href="../style.min.css?v=0.13.1" fetchpriority="high">
+</head>
+<body data-page="council-index"><div data-root=".." data-shared-header></div><script src="../cloud-config.js?v=0.13.1"></script><script src="../cloud-data.min.js?v=0.13.1"></script>
+  
+  <script defer src="../shared-header.min.js?v=0.13.1"></script><script defer src="../civic-records.min.js?v=0.13.1"></script>
+
+
+  <main>
+    <section class="inner-hero compact-inner-hero">
+      <div class="inner-hero-content">
+        <p class="eyebrow">Collected civic records</p>
+        <h1>Council meetings and decisions</h1>
+        <p>Browse locally collected formal Council meetings, decisions, agendas, minutes, notices, bylaws and motions. <a href="../committees/index.html">Search committees, boards and panels separately.</a></p>
+      </div>
+    </section>
+
+    <section class="page-shell">
+      <article class="panel council-data-panel">
+        <div class="panel-heading">
+          <div>
+            <h2>Detected civic meeting items</h2>
+            <p class="panel-subtitle">Search extracted Council decisions, committee recommendations, motions, bylaws and source documents.</p>
+          </div>
+          <span class="count council-total" id="council-item-count" aria-live="polite">Loading…</span>
+        </div>
+
+        <div class="bylaw-toolbar council-toolbar">
+          <label class="council-search-wrap">
+            <span class="sr-only">Search Council items</span>
+            <input id="council-q" type="search" placeholder="Search bylaw, motion, action, meeting or keyword">
+          </label>
+
+          <label>
+            <span class="sr-only">Filter by meeting group</span>
+            <select id="council-meeting-group">
+              <option value="council">Council</option>
+            </select>
+          </label>
+
+          <label>
+            <span class="sr-only">Filter by item type</span>
+            <select id="council-type">
+              <option value="">All item types</option>
+              <option value="Bylaw">Bylaws</option>
+              <option value="Motion">Motions</option>
+            </select>
+          </label>
+
+          <label>
+            <span class="sr-only">Filter by action</span>
+            <select id="council-action">
+              <option value="">All actions</option>
+            </select>
+          </label>
+
+          <label>
+            <span class="sr-only">Filter by year</span>
+            <select id="council-year">
+              <option value="">All years</option>
+            </select>
+          </label>
+        </div>
+
+        <div id="council-items" class="council-items">
+          <p class="empty-state">Loading collected Council data…</p>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <button class="floating-back-to-top" data-floating-back-to-top type="button" aria-label="Back to top">Back to top ↑</button>
+  <div data-root=".." data-shared-footer></div>
+  <script defer src="list.js?v=0.13.1"></script>
+  <script defer src="../back-to-top.min.js?v=0.13.1"></script>
+  <script defer src="../shared-footer.min.js?v=0.13.1"></script>
+</body>
+</html>

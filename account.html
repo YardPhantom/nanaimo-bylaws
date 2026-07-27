@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta content="width=device-width,initial-scale=1" name="viewport"><title>Account | Nanaimo Bylaw Tracker</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=0.13.1"><link rel="alternate icon" type="image/png" href="favicon.png?v=0.13.1"><link rel="preload" href="style.min.css?v=0.13.1" as="style"><link href="style.min.css?v=0.13.1" rel="stylesheet" fetchpriority="high"></head>
+<body data-page="account"><div data-root="." data-shared-header></div><script src="cloud-config.js?v=0.13.1"></script><script src="cloud-data.min.js?v=0.13.1"></script><script defer src="shared-header.min.js?v=0.13.1"></script>
+<main class="bylaw-page account-page">
+<p class="eyebrow">Private account features</p><h1>Account</h1>
+<p class="data-note">All bylaws and public Council records remain available without signing in. A Google account is required only for private watchlists, preferences, and future subscription settings.</p>
+<div class="account-message" id="account-status" aria-live="polite">Loading account…</div>
+<noscript><div class="account-message error">JavaScript must be enabled to use Google sign-in.</div></noscript>
+<section class="panel account-signin-card" id="account-signed-out" hidden>
+<h2>Sign in with Google</h2><p>Google is the only sign-in method. Nanaimo Bylaw Tracker does not create or store passwords.</p>
+<button class="primary-button google-signin-button" id="account-sign-in" type="button"><span aria-hidden="true">G</span> Continue with Google</button>
+</section>
+<div id="account-signed-in" hidden>
+<section class="panel account-profile-card"><div class="account-profile"><img id="account-photo" alt="" hidden><div><h2 id="account-name">Google user</h2><p id="account-email"></p></div></div><button class="secondary-button" id="account-sign-out" type="button">Sign out</button></section>
+<div class="account-grid">
+<section class="panel account-watchlist"><div class="panel-heading"><h2>Watchlist</h2><span class="count" id="account-watchlist-count">0</span></div><p id="account-migration-note">Loading your watchlist…</p><p>Your account watchlist is synchronized across devices after you sign in.</p><ul class="account-watchlist-items simple-list" id="account-watchlist-items"><li>Loading saved bylaws…</li></ul><p class="data-note" id="account-watchlist-unresolved" hidden></p><a class="primary-button" href="watchlist.html">Open watchlist</a></section>
+<section class="panel account-preferences"><h2>Preferences</h2><form id="account-preferences" class="account-preferences-form">
+<label for="preference-density">Display density<select id="preference-density"><option value="comfortable">Comfortable</option><option value="compact">Compact</option></select></label>
+<label for="preference-sort">Default bylaw sort<select id="preference-sort"><option value="newest">Newest first</option><option value="title">Title</option><option value="number">Bylaw number</option></select></label>
+<label class="checkbox-row"><input id="preference-filters" type="checkbox"><span>Remember my bylaw filters</span></label>
+<button class="primary-button" type="submit">Save preferences</button></form></section>
+<section class="panel account-subscriptions"><div class="panel-heading"><h2>Subscriptions</h2><span class="status active" id="subscription-state">Off</span></div>
+<p>Receive email alerts through Brevo for new, amended, consolidated, repealed, or replaced bylaw activity. Your settings are private to this Google account.</p>
+<form id="account-subscriptions" class="account-preferences-form">
+<label class="checkbox-row"><input id="subscription-active" type="checkbox"><span>Enable email alerts</span></label>
+<label for="subscription-frequency">Delivery frequency<select id="subscription-frequency"><option value="immediate">As changes are detected</option><option value="daily">Daily digest</option><option value="weekly">Weekly digest</option></select></label>
+<fieldset><legend>Changes to include</legend>
+<label class="checkbox-row"><input name="subscription-type" type="checkbox" value="new" checked><span>New bylaws and Council items</span></label>
+<label class="checkbox-row"><input name="subscription-type" type="checkbox" value="amended" checked><span>Amendments and readings</span></label>
+<label class="checkbox-row"><input name="subscription-type" type="checkbox" value="consolidated" checked><span>Consolidations</span></label>
+<label class="checkbox-row"><input name="subscription-type" type="checkbox" value="repealed" checked><span>Repeals and replacements</span></label>
+</fieldset>
+<label for="subscription-categories">Categories<select id="subscription-categories"><option value="all">All categories</option><option>Administration &amp; Governance</option><option>Animals</option><option>Business &amp; Licensing</option><option>Environment</option><option>Finance</option><option>Land Use &amp; Zoning</option><option>Parks &amp; Recreation</option><option>Public Safety</option><option>Transportation</option><option>Other</option></select></label>
+<button class="primary-button" id="subscription-save" type="submit">Save subscription settings</button>
+<p class="account-message subscription-save-message" id="subscription-save-status" aria-live="polite" hidden></p>
+<p class="data-note" id="subscription-note">Emails are sent to the address on your signed-in Google account.</p>
+</form></section>
+</div></div>
+</main>
+<div data-root="." data-shared-footer></div><script defer src="watchlist-store.min.js?v=0.13.1"></script><script defer type="module" src="account.js?v=0.13.1"></script><script defer src="shared-footer.min.js?v=0.13.1"></script></body></html>

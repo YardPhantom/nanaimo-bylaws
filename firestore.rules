@@ -1,0 +1,34 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedInAs(userId) {
+      return request.auth != null && request.auth.uid == userId;
+    }
+
+    match /users/{userId}/watchlist/{bylawNumber} {
+      allow read, create, update, delete: if signedInAs(userId);
+    }
+
+    match /users/{userId}/settings/{settingId} {
+      allow read, create, update, delete: if signedInAs(userId);
+    }
+
+    match /users/{userId}/subscriptions/{subscriptionId} {
+      allow read: if signedInAs(userId);
+      allow create, update: if signedInAs(userId)
+        && subscriptionId == "email"
+        && request.resource.data.keys().hasOnly(["active", "frequency", "changeTypes", "categories", "updatedAt"])
+        && request.resource.data.active is bool
+        && request.resource.data.frequency in ["immediate", "daily", "weekly"]
+        && request.resource.data.changeTypes is list
+        && request.resource.data.changeTypes.size() <= 4
+        && request.resource.data.categories is list
+        && request.resource.data.categories.size() <= 1;
+      allow delete: if signedInAs(userId);
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

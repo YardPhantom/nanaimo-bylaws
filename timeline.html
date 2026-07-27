@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Chronological timeline of Nanaimo bylaws and Council actions.">
+  <title>Bylaw Timeline | Nanaimo Bylaw Tracker</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg?v=0.13.1">
+  <link rel="alternate icon" type="image/png" href="favicon.png?v=0.13.1">
+  <link href="https://fonts.googleapis.com" rel="preconnect"/>
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+  <link rel="preload" href="style.min.css?v=0.13.1" as="style"><link rel="stylesheet" href="style.min.css?v=0.13.1" fetchpriority="high">
+</head>
+<body data-page="timeline"><div data-root="." data-shared-header></div><script src="cloud-config.js?v=0.13.1"></script><script src="cloud-data.min.js?v=0.13.1"></script>
+  
+  <script defer src="shared-header.min.js?v=0.13.1"></script><script defer src="civic-records.min.js?v=0.13.1"></script>
+
+  <main>
+    <section class="inner-hero compact-inner-hero">
+      <div class="inner-hero-content">
+        <p class="eyebrow">Chronological record</p>
+        <h1>Bylaw and Council timeline</h1>
+        <p>Follow collected bylaw publication years and dated Council readings, amendments, adoption decisions, referrals, and motions.</p>
+      </div>
+    </section>
+
+    <section class="page-shell">
+      <article class="panel timeline-panel">
+        <div class="panel-heading timeline-heading">
+          <div>
+            <h2>Timeline events</h2>
+            <p class="panel-subtitle">Council events use exact meeting dates. Bylaw-index records without a full date appear at their recorded year.</p>
+          </div>
+          <span class="count timeline-count" id="timeline-count" aria-live="polite">Loading…</span>
+        </div>
+
+        <div class="bylaw-toolbar timeline-toolbar">
+          <input id="timeline-q" type="search" placeholder="Search bylaw, motion, action, category or keyword">
+          <select id="timeline-type">
+            <option value="">All event types</option>
+            <option value="Council action">Council actions</option>
+            <option value="Bylaw record">Bylaw records</option>
+          </select>
+          <select id="timeline-action"><option value="">All actions</option></select>
+          <select id="timeline-year"><option value="">All years</option></select>
+          <select id="timeline-order">
+            <option value="desc">Newest first</option>
+            <option value="asc">Oldest first</option>
+          </select>
+        </div>
+
+        <div class="timeline-status" id="timeline-status" aria-live="polite">Loading collected data…</div>
+        <div class="timeline-list" id="timeline-list"></div>
+      </article>
+    </section>
+  </main>
+
+  
+  <button class="floating-back-to-top" data-floating-back-to-top type="button" aria-label="Back to top">Back to top ↑</button>
+<div data-root="." data-shared-footer></div>
+  <script defer src="watchlist-store.min.js?v=0.13.1"></script><script defer src="timeline.js?v=0.13.1"></script>
+    <script defer src="back-to-top.min.js?v=0.13.1"></script>
+<script defer src="shared-footer.min.js?v=0.13.1"></script></body>
+</html>

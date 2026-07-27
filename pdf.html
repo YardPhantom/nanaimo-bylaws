@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Archived PDF | Nanaimo Bylaw Tracker</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg?v=0.13.1">
+  <link rel="alternate icon" type="image/png" href="favicon.png?v=0.13.1">
+  <link rel="preload" href="style.min.css?v=0.13.1" as="style"><link href="style.min.css?v=0.13.1" rel="stylesheet" fetchpriority="high">
+</head>
+<body data-page="pdf"><div data-root="." data-shared-header></div><script src="cloud-config.js?v=0.13.1"></script><script src="cloud-data.min.js?v=0.13.1"></script>
+  
+  <script defer src="shared-header.min.js?v=0.13.1"></script>
+  <main class="pdf-viewer-page">
+    <a class="text-link pdf-return-link" id="pdf-return" href="#">‹ Back to previous page</a>
+    <section class="panel pdf-viewer-panel" aria-labelledby="pdf-title">
+      <div class="pdf-viewer-heading">
+        <div class="pdf-title-row">
+          <button class="watch-star pdf-watch-star" id="pdf-watch-star" type="button" hidden></button>
+          <div>
+            <p class="eyebrow" id="pdf-context">Archived source document</p>
+            <h1 id="pdf-title">Loading PDF…</h1>
+          </div>
+        </div>
+        <div class="pdf-viewer-actions" aria-label="PDF controls">
+          <button class="secondary-button" id="pdf-zoom-out" type="button">− Zoom</button>
+          <span class="meta-pill" id="pdf-zoom-label">100%</span>
+          <button class="secondary-button" id="pdf-zoom-in" type="button">+ Zoom</button>
+          <button class="secondary-button" id="pdf-fit" type="button">Fit page</button>
+          <button class="secondary-button" id="pdf-print" type="button">Print</button>
+          <a class="secondary-button" id="pdf-download" download>Download PDF</a>
+        </div>
+      </div>
+      <p class="data-note" id="pdf-status" aria-live="polite">Preparing the archived document.</p>
+      <iframe class="pdf-browser" id="pdf-browser" title="Archived PDF document"></iframe>
+    </section>
+  </main>
+  <div data-root="." data-shared-footer></div>
+  <script defer src="watchlist-store.min.js?v=0.13.1"></script>
+  <script defer src="pdf.js?v=0.13.1"></script>
+  <script defer src="shared-footer.min.js?v=0.13.1"></script>
+</body>
+</html>

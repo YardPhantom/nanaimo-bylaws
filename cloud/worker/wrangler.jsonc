@@ -1,0 +1,17 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "nanaimo-bylaw-data",
+  "main": "src/index.js",
+  "compatibility_date": "2026-07-26",
+  "workers_dev": true,
+  "preview_urls": false,
+  "vars": {
+    "ALLOWED_ORIGINS": "*"
+  },
+  "r2_buckets": [
+    {
+      "binding": "NANAIMO_DATA",
+      "bucket_name": "nanaimo-bylaw-data"
+    }
+  ]
+}

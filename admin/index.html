@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow,noarchive">
+  <meta name="description" content="Private Nanaimo Bylaw Tracker administration dashboard.">
+  <title>Admin Dashboard | Nanaimo Bylaw Tracker</title>
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg?v=0.13.1">
+  <link rel="alternate icon" type="image/png" href="../favicon.png?v=0.13.1">
+  <link rel="preload" href="../style.min.css?v=0.13.1" as="style">
+  <link href="../style.min.css?v=0.13.1" rel="stylesheet" fetchpriority="high">
+</head>
+<body data-page="admin-index">
+  <div data-root=".." data-shared-header></div><script src="../cloud-config.js?v=0.13.1"></script><script src="../cloud-data.min.js?v=0.13.1"></script>
+  <script defer src="../shared-header.min.js?v=0.13.1"></script>
+
+  <main class="bylaw-page admin-page">
+    <section class="panel admin-access-panel" id="admin-access-panel" aria-live="polite">
+      <div class="admin-access-icon" aria-hidden="true">🔒</div>
+      <p class="eyebrow">Restricted administration</p>
+      <h1>Admin dashboard</h1>
+      <p id="admin-access-message">Checking Google account access…</p>
+      <div class="button-row admin-access-actions">
+        <button class="primary-button google-signin-button" id="admin-login" type="button" hidden><span aria-hidden="true">G</span> Continue with Google</button>
+        <a class="secondary-button" href="../index.html">Go to homepage</a>
+      </div>
+      <noscript><p class="account-message error">JavaScript must be enabled to verify admin access.</p></noscript>
+    </section>
+
+    <div id="admin-content" hidden>
+      <section class="panel admin-hero-panel">
+        <div class="admin-hero-copy">
+          <p class="eyebrow">Private administration</p>
+          <h1>Admin dashboard</h1>
+          <p>Review collection health, open operational files, and copy maintenance commands without mixing administration controls into the public website.</p>
+        </div>
+        <div class="admin-identity">
+          <span class="admin-private-badge">Restricted page</span>
+          <strong id="admin-user-name">Authorized administrator</strong>
+          <span id="admin-user-email">—</span>
+          <button class="secondary-button" id="admin-sign-out" type="button">Sign out</button>
+        </div>
+      </section>
+
+      <div class="admin-status-bar" role="status" aria-live="polite">
+        <span class="admin-status-dot checking" id="admin-overall-dot" aria-hidden="true"></span>
+        <strong id="admin-overall-status">Checking runtime datasets…</strong>
+        <span id="admin-last-checked">Not checked yet</span>
+        <button class="admin-refresh-button" id="admin-refresh" type="button">Refresh</button>
+      </div>
+
+      <section aria-label="Dataset summary" class="data-overview-grid admin-overview-grid">
+        <article class="stat-card blue"><span class="stat-icon">▤</span><div><strong id="data-total">—</strong><b>collected bylaws</b><small>Current connected dataset</small></div></article>
+        <article class="stat-card teal"><span class="stat-icon">▱</span><div><strong id="data-categories">—</strong><b>categories</b><small>Calculated from connected data</small></div></article>
+        <article class="stat-card amber"><span class="stat-icon">▦</span><div><strong id="data-years">—</strong><b>year range</b><small id="data-year-range">Distinct years found</small></div></article>
+        <article class="stat-card red"><span class="stat-icon">PDF</span><div><strong id="data-civic-records">—</strong><b>indexed civic records</b><small>Council documents + committee items</small></div></article>
+      </section>
+
+      <section aria-label="Bylaw status summary" class="data-overview-grid admin-overview-grid admin-status-overview-grid">
+        <article class="stat-card green"><span class="stat-icon">✓</span><div><strong id="data-published">—</strong><b>published bylaws</b><small>Current records without a special relationship status</small></div></article>
+        <article class="stat-card purple"><span class="stat-icon">↻</span><div><strong id="data-amended">—</strong><b>amendment bylaws</b><small>Records that amend another bylaw</small></div></article>
+        <article class="stat-card amber"><span class="stat-icon">≡</span><div><strong id="data-consolidated">—</strong><b>consolidated bylaws</b><small>Records with consolidated text</small></div></article>
+        <article class="stat-card red"><span class="stat-icon">×</span><div><strong id="data-repealed">—</strong><b>repealed or replaced</b><small>Historical or superseded records</small></div></article>
+      </section>
+
+      <div class="admin-dashboard-grid">
+        <section class="panel admin-health-panel">
+          <div class="panel-heading">
+            <h2>Dataset health</h2>
+            <span class="count" id="admin-health-count">0/0</span>
+          </div>
+          <div class="admin-file-health" id="admin-file-health">
+            <p class="admin-loading-row">Checking operational files…</p>
+          </div>
+          <p class="data-note admin-panel-note" id="data-status">Live dataset totals will appear after the health check.</p>
+        </section>
+
+        <section class="panel admin-command-panel">
+          <div class="panel-heading"><h2>Collection commands</h2></div>
+          <div class="admin-command-list">
+            <article class="admin-command-card">
+              <div><strong>Collect bylaws and PDFs</strong><span>Reuse archived PDFs, repair missing text locally, and download only new or changed sources.</span></div>
+              <div class="admin-command-row"><code>python .\tools\collect_bylaws.py --download-pdfs</code><button type="button" data-copy-command="python .\tools\collect_bylaws.py --download-pdfs">Copy</button></div>
+            </article>
+            <article class="admin-command-card">
+              <div><strong>Collect 2026 civic records</strong><span>Reuse archived Council PDFs, repair missing text, and collect new or revised documents.</span></div>
+              <div class="admin-command-row"><code>python .\tools\collect_council.py --download --years 2026</code><button type="button" data-copy-command="python .\tools\collect_council.py --download --years 2026">Copy</button></div>
+            </article>
+            <article class="admin-command-card">
+              <div><strong>Run all collectors</strong><span>Consolidate duplicate archive PDFs, run both collectors, then verify archive uniqueness.</span></div>
+              <div class="admin-command-row"><code>.\tools\collect-all.cmd</code><button type="button" data-copy-command=".\tools\collect-all.cmd">Copy</button></div>
+            </article>
+            <article class="admin-command-card">
+              <div><strong>Publish current state to R2</strong><span>Upload only changed JSON, PDFs, text and manifests after the R2 environment variables are configured.</span></div>
+              <div class="admin-command-row"><code>.\tools\cloud-publish.cmd</code><button type="button" data-copy-command=".\tools\cloud-publish.cmd">Copy</button></div>
+            </article>
+            <article class="admin-command-card">
+              <div><strong>Consolidate PDF archive</strong><span>Rewrite archive JSON references and remove same-hash duplicate PDF copies.</span></div>
+              <div class="admin-command-row"><code>python .\tools\deduplicate_archive.py --apply</code><button type="button" data-copy-command="python .\tools\deduplicate_archive.py --apply">Copy</button></div>
+            </article>
+            <article class="admin-command-card">
+              <div><strong>Verify Council collection</strong><span>Run strict validation after collection completes.</span></div>
+              <div class="admin-command-row"><code>.\tools\verify-council.cmd --strict</code><button type="button" data-copy-command=".\tools\verify-council.cmd --strict">Copy</button></div>
+            </article>
+          </div>
+          <p class="admin-copy-status" id="admin-copy-status" aria-live="polite"></p>
+        </section>
+      </div>
+
+      <section class="panel admin-quick-panel">
+        <div class="panel-heading"><h2>Quick actions</h2></div>
+        <div class="admin-quick-grid">
+          <a href="../bylaws/index.html"><span aria-hidden="true">⌕</span><strong>Browse bylaws</strong><small>Review the public bylaw search.</small></a>
+          <a href="../council/index.html"><span aria-hidden="true">▤</span><strong>Review Council items</strong><small>Check decisions and extracted records.</small></a>
+          <a href="../committees/index.html"><span aria-hidden="true">◫</span><strong>Review committees</strong><small>Check advisory groups and recommendations.</small></a>
+          <a href="../timeline.html"><span aria-hidden="true">↕</span><strong>Open timeline</strong><small>Inspect chronological activity.</small></a>
+          <a href="../account.html"><span aria-hidden="true">●</span><strong>Account settings</strong><small>Review private preferences and alerts.</small></a>
+          <a href="../data/index.html"><span aria-hidden="true">{ }</span><strong>Public data page</strong><small>View the public-facing data explanation.</small></a>
+        </div>
+      </section>
+
+      <section class="panel admin-data-panel">
+        <div class="panel-heading"><h2>Operational files</h2></div>
+        <div class="data-link-grid admin-data-links">
+          <a href="../data/bylaws.json" data-runtime-file="data/bylaws.json"><strong>Bylaws JSON</strong><span>Connected dataset used throughout the website.</span></a>
+          <a href="../data/change-log.json" data-runtime-file="data/change-log.json"><strong>Bylaw change log</strong><span>Additions, changes, removals, and collection history.</span></a>
+          <a href="../data/council-meetings.json" data-runtime-file="data/council-meetings.json"><strong>Council meetings JSON</strong><span>Meeting dates, types, and source URLs.</span></a>
+          <a href="../data/council-documents.json" data-runtime-file="data/council-documents.json"><strong>Council documents JSON</strong><span>Agenda, minutes, notices, hashes, and local paths.</span></a>
+          <a href="../data/council-items.json" data-runtime-file="data/council-items.json"><strong>Council items JSON</strong><span>Extracted bylaw references, motions, and actions.</span></a>
+          <a href="../data/committee-items.json" data-runtime-file="data/committee-items.json"><strong>Committee items JSON</strong><span>Committee, board, commission, and panel records.</span></a>
+          <a href="../data/council-verification.json" data-runtime-file="data/council-verification.json"><strong>Council verification JSON</strong><span>PASS, WARN, and FAIL checks from the latest run.</span></a>
+          <a href="../collection-status.json" data-runtime-file="collection-status.json"><strong>Cloud collection status</strong><span>Latest scheduled collection, publish counts, and archive totals.</span></a>
+          <a href="../archive-manifest.json" data-runtime-file="archive-manifest.json"><strong>Archive manifest</strong><span>SHA-256 inventory of the cloud archive and duplicate count.</span></a>
+          <a href="../archive/" data-runtime-file="archive"><strong>Archive storage</strong><span>Protected / directory listing disabled. Archive files may be accessed through their recorded links.</span></a>
+        </div>
+      </section>
+
+      <section class="panel admin-security-panel">
+        <div>
+          <p class="eyebrow">Security boundary</p>
+          <h2>Public civic data, private administration</h2>
+          <p>Published JSON and archived civic PDFs are intentionally readable through the Worker. Google sign-in protects this dashboard only. R2 credentials, Cloudflare tokens, collection logs, subscription records, and Firebase credentials must remain private.</p>
+        </div>
+        <a class="secondary-button" href="../privacy.html">Review privacy page</a>
+      </section>
+    </div>
+  </main>
+
+  <div class="toast" id="admin-toast" role="status" aria-live="polite"></div>
+  <div data-root=".." data-shared-footer></div>
+  <script type="module" data-account-session src="../account-session.min.js?v=0.13.1"></script>
+  <script type="module" src="admin.js?v=0.13.1"></script>
+  <script defer src="../shared-footer.min.js?v=0.13.1"></script>
+</body>
+</html>

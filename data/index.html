@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Collected data and sources used by Nanaimo Bylaw Tracker.">
+  <title>Collected Data | Nanaimo Bylaw Tracker</title>
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg?v=0.13.1">
+  <link rel="alternate icon" type="image/png" href="../favicon.png?v=0.13.1">
+  <link rel="preload" href="../style.min.css?v=0.13.1" as="style">
+  <link rel="stylesheet" href="../style.min.css?v=0.13.1" fetchpriority="high">
+</head>
+<body data-page="data-index">
+  <div data-root=".." data-shared-header></div><script src="../cloud-config.js?v=0.13.1"></script><script src="../cloud-data.min.js?v=0.13.1"></script>
+  <script defer src="../shared-header.min.js?v=0.13.1"></script>
+
+  <main class="bylaw-page info-page">
+    <p class="eyebrow">Data sources</p>
+    <h1>Collected bylaw data</h1>
+    <p class="data-note" id="data-status" aria-live="polite">Loading the current bylaw and civic-record datasets…</p>
+
+    <section aria-label="Dataset summary" class="data-overview-grid">
+      <article class="stat-card blue">
+        <span class="stat-icon">▤</span>
+        <div><strong id="data-total">—</strong><b>collected records</b><small>Current connected dataset</small></div>
+      </article>
+      <article class="stat-card teal">
+        <span class="stat-icon">▱</span>
+        <div><strong id="data-categories">—</strong><b>categories</b><small>Calculated live</small></div>
+      </article>
+      <article class="stat-card amber">
+        <span class="stat-icon">▦</span>
+        <div><strong id="data-years">—</strong><b>bylaw years</b><small>Distinct years found</small></div>
+      </article>
+      <article class="stat-card red">
+        <span class="stat-icon">PDF</span>
+        <div><strong id="data-council-documents">—</strong><b>indexed civic documents</b><small>Council and committee source records</small></div>
+      </article>
+    </section>
+
+    <div aria-label="Bylaw statistics" class="stats-grid">
+      <a aria-label="Browse all online bylaws" class="stat-card blue" href="../bylaws/index.html?view=online">
+        <span class="stat-icon">▤</span><div><strong id="stat-online">—</strong><b>online bylaws</b><small>Currently available</small></div>
+      </a>
+      <a aria-label="Browse locally connected bylaw records" class="stat-card teal" href="../bylaws/index.html?view=connected">
+        <span class="stat-icon">↻</span><div><strong id="stat-connected">—</strong><b>records connected</b><small>Loading current dataset</small></div>
+      </a>
+      <a aria-label="Browse amended bylaws" class="stat-card amber" href="../bylaws/index.html?view=amended">
+        <span class="stat-icon">✎</span><div><strong id="stat-amended">—</strong><b>amendment bylaws</b><small>Explicitly linked to a base bylaw</small></div>
+      </a>
+      <a aria-label="Browse repealed or replaced bylaws" class="stat-card red" href="../bylaws/index.html?view=repealed">
+        <span class="stat-icon">×</span><div><strong id="stat-repealed">—</strong><b>repealed or replaced</b><small>Live total identified in collected official records</small></div>
+      </a>
+      <a aria-label="Browse detected Council items" class="stat-card teal" href="../council/index.html">
+        <span class="stat-icon">☷</span><div><strong id="stat-council-items">—</strong><b>detected Council items</b><small>Bylaws and motions extracted from records</small></div>
+      </a>
+      <a aria-label="Browse detected Committee items" class="stat-card blue" href="../committees/index.html">
+        <span class="stat-icon">▧</span><div><strong id="stat-committee-items">—</strong><b>Committee items</b><small>Recommendations and motions extracted from committee records</small></div>
+      </a>
+      <a aria-label="Browse indexed Council meetings" class="stat-card amber" href="../council/index.html">
+        <span class="stat-icon">◫</span><div><strong id="stat-council-meetings">—</strong><b>Council meetings indexed</b><small>Meeting records included in the archive</small></div>
+      </a>
+      <a aria-label="Browse preserved source PDFs" class="stat-card red" href="../council/index.html">
+        <span class="stat-icon">⇩</span><div><strong id="stat-archived-pdfs">—</strong><b>archived source PDFs</b><small>Original documents preserved in archive storage</small></div>
+      </a>
+    </div>
+
+    <section class="panel info-card">
+      <h2>Primary source</h2>
+      <p>The collection process reads the City of Nanaimo’s public online bylaw index and preserves the available title, number, description, category, status, source URL, and PDF reference. Official City pages and documents remain authoritative.</p>
+      <div class="button-row">
+        <a class="primary-button" href="../bylaws/index.html">Browse collected bylaws</a>
+        <a class="secondary-button" href="bylaws.json" data-runtime-file="data/bylaws.json">Open current JSON</a>
+      </div>
+    </section>
+
+    <section class="panel data-source-section">
+      <div class="panel-heading"><h2>Council meeting datasets</h2></div>
+      <div class="data-link-grid">
+        <a href="../council/index.html"><strong>Browse Council items</strong><span>Search extracted bylaws, motions and Council actions.</span></a>
+        <a href="council-meetings.json" data-runtime-file="data/council-meetings.json"><strong>Council meetings JSON</strong><span>Discovered meeting dates, types and source URLs.</span></a>
+        <a href="council-documents.json" data-runtime-file="data/council-documents.json"><strong>Council documents JSON</strong><span>Agenda, minutes, notices, hashes and local paths.</span></a>
+        <a href="council-verification.json" data-runtime-file="data/council-verification.json"><strong>Council verification JSON</strong><span>PASS, WARN, and FAIL checks for the latest Council collection.</span></a>
+        <a href="council-items.json" data-runtime-file="data/council-items.json"><strong>Council items JSON</strong><span>Extracted bylaw references, motions and actions.</span></a>
+        <a href="committee-items.json" data-runtime-file="data/committee-items.json"><strong>Committee items JSON</strong><span>Recommendations and motions extracted from committee, board, commission, and panel records.</span></a>
+        <a href="council-discussions.json" data-runtime-file="data/council-discussions.json"><strong>Homepage discussions JSON</strong><span>The newest records used by the homepage panel.</span></a>
+      </div>
+    </section>
+  </main>
+
+  <div data-root=".." data-shared-footer></div>
+  <script defer src="index.min.js?v=0.13.1"></script>
+  <script defer src="../shared-footer.min.js?v=0.13.1"></script>
+</body>
+</html>
