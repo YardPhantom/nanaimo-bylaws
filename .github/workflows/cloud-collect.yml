@@ -1,7 +1,18 @@
-name: Collect and publish Nanaimo data
+name: Collect, publish and notify Nanaimo data
 
 on:
   workflow_dispatch:
+    inputs:
+      subscription_mode:
+        description: Subscription email action after collection
+        required: true
+        default: send
+        type: choice
+        options:
+          - send
+          - dry-run
+          - test
+          - skip
   schedule:
     - cron: "17 6,18 * * *"
       timezone: "America/Vancouver"
@@ -22,6 +33,20 @@ jobs:
       R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
       R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
       R2_BUCKET_NAME: ${{ secrets.R2_BUCKET_NAME }}
+      FIREBASE_SERVICE_ACCOUNT_BASE64: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_BASE64 }}
+      SMTP_USERNAME: ${{ secrets.BREVO_SMTP_USERNAME }}
+      SMTP_PASSWORD: ${{ secrets.BREVO_SMTP_PASSWORD }}
+      SMTP_FROM: ${{ secrets.BREVO_SMTP_FROM }}
+      SMTP_REPLY_TO: ${{ secrets.BREVO_SMTP_REPLY_TO }}
+      SMTP_TEST_RECIPIENT: ${{ secrets.SUBSCRIPTION_TEST_RECIPIENT }}
+      PUBLIC_SITE_URL: ${{ vars.PUBLIC_SITE_URL }}
+      SUBSCRIPTION_MODE: ${{ github.event_name == 'workflow_dispatch' && inputs.subscription_mode || 'send' }}
+      SUBSCRIPTION_TIMEZONE: America/Vancouver
+      DAILY_SEND_HOUR_LOCAL: "8"
+      WEEKLY_SEND_WEEKDAY: "0"
+      WEEKLY_SEND_HOUR_LOCAL: "8"
+      MAX_EMAILS_PER_RUN: "100"
+      MAX_EVENTS_PER_EMAIL: "50"
       PYTHONUNBUFFERED: "1"
 
     steps:
@@ -71,6 +96,66 @@ jobs:
       - name: Verify required R2 objects
         run: python tools/cloud_sync.py verify
 
+      - name: Check subscription email configuration
+        id: subscription_config
+        shell: bash
+        run: |
+          if [ "$SUBSCRIPTION_MODE" = "skip" ]; then
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            echo "Subscription delivery skipped by workflow input."
+            exit 0
+          fi
+
+          credential_names=(FIREBASE_SERVICE_ACCOUNT_BASE64 SMTP_USERNAME SMTP_PASSWORD SMTP_FROM)
+          configured=0
+          for name in "${credential_names[@]}"; do
+            if [ -n "${!name:-}" ]; then
+              configured=$((configured + 1))
+            fi
+          done
+
+          if [ "$configured" -eq 0 ]; then
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::Subscription email secrets are not configured; collection succeeded and email delivery was skipped."
+            exit 0
+          fi
+
+          missing=0
+          for name in "${credential_names[@]}" PUBLIC_SITE_URL; do
+            if [ -z "${!name:-}" ]; then
+              echo "::error::$name is required when subscription email delivery is configured."
+              missing=1
+            fi
+          done
+          if [ "$SUBSCRIPTION_MODE" = "test" ] && [ -z "${SMTP_TEST_RECIPIENT:-}" ]; then
+            echo "::error::SUBSCRIPTION_TEST_RECIPIENT is required for test mode."
+            missing=1
+          fi
+          if [ "$missing" -ne 0 ]; then
+            exit 1
+          fi
+          echo "enabled=true" >> "$GITHUB_OUTPUT"
+
+      - name: Process subscription email delivery
+        if: steps.subscription_config.outputs.enabled == 'true'
+        shell: bash
+        run: |
+          case "$SUBSCRIPTION_MODE" in
+            dry-run)
+              python tools/send_subscription_updates.py --dry-run
+              ;;
+            test)
+              python tools/send_subscription_updates.py --test-recipient "$SMTP_TEST_RECIPIENT"
+              ;;
+            send)
+              python tools/send_subscription_updates.py
+              ;;
+            *)
+              echo "::error::Unsupported subscription mode: $SUBSCRIPTION_MODE"
+              exit 1
+              ;;
+          esac
+
       - name: Upload collection diagnostics
         if: always()
         uses: actions/upload-artifact@v7
@@ -80,6 +165,7 @@ jobs:
           retention-days: 14
           path: |
             collection-status.json
+            subscription-delivery-status.json
             archive-manifest.json
             data/*verification*.json
             data/*change-log*.json

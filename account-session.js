@@ -12,6 +12,7 @@ import {
 import {
   collection,
   deleteDoc,
+  deleteField,
   doc,
   getDoc,
   getDocs,
@@ -136,19 +137,28 @@ async function saveSubscription(settings) {
   const allowedTypes = ["new", "amended", "consolidated", "repealed"];
   const changeTypes = [...new Set((settings.changeTypes || []).filter(value => allowedTypes.includes(value)))];
   if (settings.active && !changeTypes.length) throw new Error("Select at least one change type.");
-  const normalizedEmail = String(currentUser.email || "").trim().toLowerCase();
+  const reference = doc(db, "users", currentUser.uid, "subscriptions", "email");
+  const existingSnapshot = await getDoc(reference);
+  const existing = existingSnapshot.exists() ? existingSnapshot.data() : {};
+  const active = Boolean(settings.active);
   const clean = {
-    active: Boolean(settings.active),
+    active,
     frequency: ["immediate", "daily", "weekly"].includes(settings.frequency) ? settings.frequency : "daily",
     changeTypes,
     categories: settings.category && settings.category !== "all" ? [settings.category] : [],
-    recipientEmail: normalizedEmail,
-    subscriptionKey: normalizedEmail ? `email:${normalizedEmail}` : `uid:${currentUser.uid}`,
     updatedAt: serverTimestamp()
   };
-  // One fixed document per account. Saving again updates this document; it never creates a second alert signup.
-  await setDoc(doc(db, "users", currentUser.uid, "subscriptions", "email"), clean, { merge: true });
-  return clean;
+  if (!existingSnapshot.exists()) clean.createdAt = serverTimestamp();
+  if (active && !existing.active) clean.activatedAt = serverTimestamp();
+  // The recipient address is resolved server-side from Firebase Authentication.
+  // Remove any fields written by older builds so the private settings document
+  // contains preferences only.
+  await setDoc(reference, {
+    ...clean,
+    recipientEmail: deleteField(),
+    subscriptionKey: deleteField()
+  }, { merge: true });
+  return { ...existing, ...clean };
 }
 
 window.NBTAccount = {

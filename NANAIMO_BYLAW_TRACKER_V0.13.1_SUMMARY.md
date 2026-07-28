@@ -34,19 +34,45 @@ Added an optional cloud-runtime architecture that keeps the authored website on 
 
 ## Activation status
 
-Cloud mode is included but disabled by default because the final `workers.dev` URL and R2 credentials are deployment-specific. Follow `CLOUD_SETUP.md`, deploy the Worker, seed R2, then enable and configure `cloud-config.js`.
+Production cloud mode is active at `https://nanaimo-bylaw-data.yardplots.workers.dev`. `cloud-config.js` has cloud loading enabled with local fallback disabled. Preserve the configured file during ordinary IIS upgrades.
 
 ## Same-version deployment cleanup
 
 - Updated GitHub workflows to current GitHub-hosted action majors and fixed Ubuntu 24.04 runners.
 - Added fail-fast validation for missing R2 secrets before installing collection dependencies.
-- Replaced manual Worker dependency installation in CI with Cloudflare’s Wrangler action and pinned Wrangler 4.114.0.
+- Replaced the deprecated `cloudflare/wrangler-action@v3` deployment step with `actions/setup-node@v6`, Node.js 24, and direct pinned `npx wrangler@4.114.0 deploy`.
 - Pinned the local Worker development dependency and documented its Node.js requirement.
 - Rewrote `CLOUD_SETUP.md` as an exact, ordered GitHub/R2/Worker activation guide that distinguishes the Worker API token from the R2 S3 access-key pair. It now configures the account `workers.dev` subdomain before the first non-interactive GitHub deployment.
 - Kept the release version at V0.13.1.
+- Updated the service worker to purge the prior same-version static cache and revalidate authored assets before using offline cache fallback.
 
 ## Release
 
 - Version: **V0.13.1**
 - Next code change: **V0.13.2**
 - ZIP: `nanaimo-bylaw-tracker-v0.13.1.zip`
+
+## Same-version cloud response cleanup
+
+- Fixed service-worker caching so response bodies are cloned before asynchronous cache writes; this prevents `Response body is already used` errors.
+- Fixed the R2 Worker so complete object reads return HTTP 200 and HTTP 206 is reserved for requests containing a real `Range` header.
+- Cloud JSON remains network-first and is never stored in the static service-worker cache.
+
+## Same-version GitHub deployment warning cleanup
+
+- Removed `cloudflare/wrangler-action@v3`, which still declared the deprecated Node.js 20 action runtime.
+- Added explicit Node.js 24 setup through `actions/setup-node@v6`.
+- Kept Wrangler pinned at 4.114.0 and retained the existing Worker name, R2 binding, secrets, paths, concurrency, and deployment triggers.
+- Added fail-fast validation for the Cloudflare deployment token and account ID.
+- Disabled Wrangler telemetry during CI deployment.
+
+
+## Same-version civic count cleanup
+
+- Consolidated the homepage Council and committee loaders so each runtime dataset is requested once and shared across the dashboard and side panels.
+- Changed the Council activity side panel from the raw combined civic-item count to the same Council/public-hearing classification used by the dashboard.
+- Changed the side-panel document total to unique Council/public-hearing source documents rather than all civic documents.
+- Changed the Council meetings card to exclude committee, board, commission, and panel meetings.
+- Preserved dedicated committee counts and the combined civic-document total on the data overview page.
+- Kept the release version at V0.13.1.
+- Updated the service worker to purge the prior same-version static cache and revalidate authored assets before using offline cache fallback.

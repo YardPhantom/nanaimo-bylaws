@@ -143,6 +143,19 @@ def classify_meeting(title: str) -> tuple[str, str]:
     if "task force" in normalized or "working group" in normalized:
         return normalize_space(title) or "Advisory group meeting", "committee"
     return normalize_space(title) or "Council meeting", "council"
+
+
+def is_committee_item(item: dict[str, Any]) -> bool:
+    explicit = normalize_space(item.get("meeting_group") or "").lower()
+    if explicit in {"committee", "board", "commission", "panel"}:
+        return True
+    combined = " ".join(
+        normalize_space(item.get(key) or "")
+        for key in ("meeting_title", "committee_name", "title")
+    )
+    return classify_meeting(combined)[1] in {"committee", "board", "commission", "panel"}
+
+
 ACTION_TERMS = (
     "adopted", "passed", "reading", "rescinded", "amended", "deferred",
     "directed", "approved", "endorsed", "received", "referred", "denied",
@@ -1147,6 +1160,71 @@ def compare_document_sets(previous: list[dict[str, Any]], current: list[dict[str
     return {"added": added, "removed": removed, "changed": changed}
 
 
+def council_item_identity(item: dict[str, Any]) -> str:
+    explicit = str(item.get("id") or "").strip()
+    if explicit:
+        return explicit
+    material = (
+        item.get("date"), item.get("meeting_title"), item.get("meeting_group"),
+        item.get("type"), item.get("number"), item.get("action"), item.get("title"),
+    )
+    return sha256(json.dumps(material, ensure_ascii=False).encode()).hexdigest()[:16]
+
+
+def council_item_fingerprint(item: dict[str, Any]) -> str:
+    fields = {
+        key: item.get(key)
+        for key in (
+            "date", "meeting_title", "meeting_group", "type", "number", "title",
+            "action", "summary", "category", "department", "bylaw_detail_url",
+            "source_document_url", "local_document", "meeting_url",
+        )
+    }
+    return sha256(json.dumps(fields, sort_keys=True, ensure_ascii=False).encode()).hexdigest()
+
+
+def compare_item_sets(previous: list[dict[str, Any]], current: list[dict[str, Any]]) -> dict[str, Any]:
+    old = {council_item_identity(item): item for item in previous}
+    new = {council_item_identity(item): item for item in current}
+    added_ids = sorted(new.keys() - old.keys())
+    removed_ids = sorted(old.keys() - new.keys())
+    changed_ids = sorted(
+        key for key in old.keys() & new.keys()
+        if council_item_fingerprint(old[key]) != council_item_fingerprint(new[key])
+    )
+    return {
+        "added": [new[key] for key in added_ids],
+        "changed": [new[key] for key in changed_ids],
+        "removed": [old[key] for key in removed_ids],
+    }
+
+
+def build_council_change_events(changes: dict[str, Any], generated_at: str) -> list[dict[str, Any]]:
+    events = []
+    for change_type in ("added", "changed"):
+        for item in changes.get(change_type, []):
+            identity = council_item_identity(item)
+            events.append({
+                "id": f"{generated_at}:{change_type}:{identity}",
+                "date": generated_at,
+                "change_type": change_type,
+                "item_id": identity,
+                "meeting_date": item.get("date"),
+                "meeting_title": item.get("meeting_title"),
+                "meeting_group": item.get("meeting_group"),
+                "type": item.get("type"),
+                "number": item.get("number"),
+                "title": item.get("title") or item.get("summary") or "Council item",
+                "action": item.get("action"),
+                "summary": item.get("summary"),
+                "category": item.get("category") or "Other",
+                "bylaw_detail_url": item.get("bylaw_detail_url"),
+                "source_document_url": item.get("source_document_url"),
+                "local_document": item.get("local_document"),
+                "meeting_url": item.get("meeting_url"),
+            })
+    return events
+
 
 class CouncilProgress:
     """Dependency-free terminal progress bar for Council collection stages."""
@@ -1351,6 +1429,15 @@ def collect(download: bool, years: list[int]) -> None:
     )
     changes = compare_document_sets(previous_documents, documents)
 
+    previous_items_payload = read_json(ITEMS_JSON, {})
+    previous_items = (
+        previous_items_payload if isinstance(previous_items_payload, list)
+        else previous_items_payload.get("items", [])
+    )
+    item_changes = compare_item_sets(previous_items, items)
+    # The first collected dataset is a baseline, not a notification event.
+    run_item_events = build_council_change_events(item_changes, generated_at) if previous_items else []
+
     metadata = {
         "generated_at": generated_at,
         "timezone": "America/Vancouver",
@@ -1367,7 +1454,7 @@ def collect(download: bool, years: list[int]) -> None:
     meetings_payload = {"metadata": metadata, "meetings": meetings}
     documents_payload = {"metadata": metadata, "documents": documents}
     items_payload = {"metadata": metadata, "summaries": summaries, "items": items}
-    committee_items = [item for item in items if str(item.get("meeting_group") or "").lower() in {"committee", "board", "commission", "panel"}]
+    committee_items = [item for item in items if is_committee_item(item)]
     committee_counts = {}
     for item in committee_items:
         name = normalize_space(item.get("meeting_title") or item.get("committee_name") or "Committee, board or panel")
@@ -1403,7 +1490,7 @@ def collect(download: bool, years: list[int]) -> None:
         write_json(run_dir / "featured.json", featured_payload)
     write_json(run_dir / "changes.json", changes)
 
-    log = read_json(CHANGE_LOG, {"timezone": "America/Vancouver", "runs": []})
+    log = read_json(CHANGE_LOG, {"timezone": "America/Vancouver", "runs": [], "events": []})
     log["last_updated"] = generated_at
     log.setdefault("runs", []).append({
         "generated_at": generated_at,
@@ -1414,7 +1501,19 @@ def collect(download: bool, years: list[int]) -> None:
         "added_documents": len(changes["added"]),
         "changed_documents": len(changes["changed"]),
         "removed_documents": len(changes["removed"]),
+        "added_items": len(item_changes["added"]),
+        "changed_items": len(item_changes["changed"]),
+        "removed_items": len(item_changes["removed"]),
+        "event_count": len(run_item_events),
     })
+    log["runs"] = log["runs"][-365:]
+    log.setdefault("events", []).extend(run_item_events)
+    log["events"] = sorted(
+        log["events"],
+        key=lambda event: str(event.get("date") or ""),
+        reverse=True,
+    )[:500]
+    log["event_count"] = len(log["events"])
     write_json(CHANGE_LOG, log)
 
     print(f"Wrote {len(meetings)} meetings to {MEETINGS_JSON}")

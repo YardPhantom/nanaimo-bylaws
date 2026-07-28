@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 
 <html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/><meta content="Privacy information for Nanaimo Bylaw Tracker." name="description"/><title>Privacy | Nanaimo Bylaw Tracker</title>
-  <link rel="icon" type="image/svg+xml" href="favicon.svg?v=0.13.1">
-  <link rel="alternate icon" type="image/png" href="favicon.png?v=0.13.1">
-<link rel="preload" href="style.min.css?v=0.13.1" as="style"><link href="style.min.css?v=0.13.1" rel="stylesheet" fetchpriority="high"></head><body data-page="privacy"><div data-root="." data-shared-header></div><script src="cloud-config.js?v=0.13.1"></script><script src="cloud-data.min.js?v=0.13.1"></script><script defer src="shared-header.min.js?v=0.13.1"></script><main class="bylaw-page info-page">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg?v=0.13.2">
+  <link rel="alternate icon" type="image/png" href="favicon.png?v=0.13.2">
+<link rel="preload" href="style.min.css?v=0.13.2" as="style"><link href="style.min.css?v=0.13.2" rel="stylesheet" fetchpriority="high"></head><body data-page="privacy"><div data-root="." data-shared-header></div><script src="cloud-config.js?v=0.13.2"></script><script src="cloud-data.min.js?v=0.13.2"></script><script defer src="shared-header.min.js?v=0.13.2"></script><main class="bylaw-page info-page">
 <p class="eyebrow">Privacy</p>
 <h1>Privacy information</h1>
 
@@ -16,14 +16,16 @@
 
 <section class="panel info-card">
 <h2>Google account sign-in and Firebase</h2>
-<p>Public bylaws and Council records do not require an account. Google sign-in is used only for private account features such as synchronized watchlists and preferences, and eventually subscription settings.</p>
+<p>Public bylaws and Council records do not require an account. Google sign-in is used only for private account features such as synchronized watchlists, preferences, and email subscription settings.</p>
 <p>When you sign in, Google and Firebase process authentication information. Hesh co. receives the Firebase user identifier and basic Google profile information supplied for sign-in, such as your name, email address, and profile image. Hesh co. does not receive or store your Google password.</p>
 <p>Private watchlists and preferences are stored in Google Cloud Firestore under your Firebase user identifier and are protected by user-specific access rules.</p>
 </section>
 
 <section class="panel info-card">
-<h2>Email subscriptions</h2><p>Signed-in users may choose to store private email-alert preferences in Firebase. Alert messages are relayed through Brevo, an independent third-party email delivery provider. Brevo processes the recipient email address and delivery metadata needed to send and troubleshoot those messages.</p>
-<p>The email subscription feature is not currently implemented. Do not enter an email address expecting an active subscription service. This privacy notice will be updated before email addresses or other subscription information are actively collected or processed through the site.</p>
+<h2>Email subscriptions</h2>
+<p>Signed-in users may enable private email-alert preferences in Firebase. The subscription document stores the selected frequency, categories, change types, activation time, and whether alerts are enabled. The recipient address is resolved from Firebase Authentication when the trusted sender runs; it is not duplicated in the subscription document.</p>
+<p>After a cloud collection run detects eligible activity, alert messages are relayed through Brevo, an independent third-party transactional email provider. Brevo processes the recipient address and delivery metadata required to send and troubleshoot the message. Nanaimo Bylaw Tracker stores a one-way hash of the recipient address, delivered event identifiers, timestamps, and aggregate delivery counts to prevent duplicate messages. It does not publish this delivery state.</p>
+<p>You can disable email alerts at any time from the Account page. Disabling alerts stops future delivery but does not control Brevo’s independent operational retention of prior delivery records.</p>
 </section>
 
 <section class="panel info-card">
@@ -39,4 +41,4 @@
 <p>Hesh co. does not sell or rent personal information collected through Nanaimo Bylaw Tracker. Information may be accessed or disclosed only when reasonably necessary to operate and secure the site, investigate misuse, comply with legal obligations, or protect the rights and safety of the site and its users.</p>
 <p>This notice may be revised when site features, hosting, data collection, or third-party services change. Material changes will be reflected on this page.</p>
 </section>
-</main><div data-root="." data-shared-footer=""></div><script defer src="shared-footer.min.js?v=0.13.1"></script></body></html>
+</main><div data-root="." data-shared-footer=""></div><script defer src="shared-footer.min.js?v=0.13.2"></script></body></html>

@@ -180,7 +180,7 @@ subscriptionForm?.addEventListener("submit", async event => {
     subscriptionState.textContent = saved.active ? "On" : "Off";
     subscriptionState.className = `status ${saved.active ? "active" : "consolidated"}`;
     const message = saved.active
-      ? "Saved. Email alerts are enabled for this account."
+      ? "Saved. Email alerts are enabled and will be processed after the next cloud collection run."
       : "Saved. Email alerts are turned off for this account.";
     const optionLabels = {
       new: "New bylaws and Council items",
@@ -196,7 +196,7 @@ subscriptionForm?.addEventListener("submit", async event => {
   } catch (error) {
     console.error("[NBT] Subscription save failed", error);
     const message = error?.code === "permission-denied" || String(error?.message || "").includes("insufficient permissions")
-      ? "Firestore denied this save. Publish the supplied V0.13.1 firestore.rules, then sign out and back in."
+      ? "Firestore denied this save. Publish the supplied V0.13.2 firestore.rules, then sign out and back in."
       : (error?.message || "Subscription settings could not be saved.");
     setSubscriptionStatus(message, "error");
     setStatus(message, "error");

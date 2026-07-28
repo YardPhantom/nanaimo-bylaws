@@ -1,15 +1,24 @@
-const CACHE = "nbt-static-0.13.1";
+const CACHE = "nbt-static-0.13.2-copy-6";
 const CORE = [
-  "./style.min.css?v=0.13.1",
-  "./shared-header.min.js?v=0.13.1",
-  "./shared-footer.min.js?v=0.13.1",
-  "./cloud-data.min.js?v=0.13.1",
-  "./assets/brand-icon.svg?v=0.13.1",
-  "./favicon.svg?v=0.13.1",
-  "./data/index.min.js?v=0.13.1"
+  "./style.min.css?v=0.13.2",
+  "./shared-header.min.js?v=0.13.2",
+  "./shared-footer.min.js?v=0.13.2",
+  "./cloud-data.min.js?v=0.13.2",
+  "./assets/brand-icon.svg?v=0.13.2",
+  "./favicon.svg?v=0.13.2",
+  "./data/index.min.js?v=0.13.2"
 ];
 self.addEventListener("install", event => {
-  event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(CORE)).catch(() => undefined));
+  event.waitUntil(
+    caches.open(CACHE)
+      .then(cache => Promise.all(CORE.map(url =>
+        fetch(url, { cache: "reload" }).then(response => {
+          if (!response.ok) throw new Error(`Core asset HTTP ${response.status}: ${url}`);
+          return cache.put(url, response);
+        })
+      )))
+      .catch(() => undefined)
+  );
   self.skipWaiting();
 });
 self.addEventListener("activate", event => {
@@ -26,15 +35,21 @@ self.addEventListener("fetch", event => {
   const isPage = request.mode === "navigate" || url.pathname.endsWith(".html") || url.pathname.endsWith("/");
   if (isRuntime || isCloudConfig || isPage) {
     event.respondWith(fetch(request).then(response => {
-      if (!isRuntime && !isCloudConfig && response.ok) caches.open(CACHE).then(cache => cache.put(request, response.clone()));
+      if (!isRuntime && !isCloudConfig && response.ok) {
+        const cacheCopy = response.clone();
+        event.waitUntil(caches.open(CACHE).then(cache => cache.put(request, cacheCopy)));
+      }
       return response;
     }).catch(() => caches.match(request)));
     return;
   }
   if (/\.(?:css|js|svg|png|ico|webp|jpg|jpeg)$/i.test(url.pathname)) {
-    event.respondWith(caches.match(request).then(cached => cached || fetch(request).then(response => {
-      if (response.ok) caches.open(CACHE).then(cache => cache.put(request, response.clone()));
+    event.respondWith(fetch(request, { cache: "no-cache" }).then(response => {
+      if (response.ok) {
+        const cacheCopy = response.clone();
+        event.waitUntil(caches.open(CACHE).then(cache => cache.put(request, cacheCopy)));
+      }
       return response;
-    })));
+    }).catch(() => caches.match(request)));
   }
 });

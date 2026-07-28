@@ -41,9 +41,10 @@
   function meetingGroup(item={}){
     const explicit=String(item.meeting_group||'').toLowerCase();
     if(['committee','board','commission','panel'].includes(explicit))return 'committee';
+    const title=`${item.meeting_title||''} ${item.committee_name||''} ${item.title||''}`.toLowerCase();
+    if(/committee|board|commission|panel|task force|working group|governance and priorities|finance and audit/.test(title))return 'committee';
     if(['council','public-hearing'].includes(explicit))return 'council';
-    const title=String(item.meeting_title||item.title||'').toLowerCase();
-    return /committee|board|commission|panel|governance and priorities|finance and audit/.test(title)?'committee':'council';
+    return 'council';
   }
   function committeeName(item={}){return String(item.meeting_title||item.committee_name||'Committee, board or panel').trim();}
   function slug(value=''){return String(value).toLowerCase().normalize('NFKD').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');}

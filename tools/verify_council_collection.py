@@ -30,6 +30,7 @@ TZ = ZoneInfo("America/Vancouver")
 MEETINGS = DATA / "council-meetings.json"
 DOCUMENTS = DATA / "council-documents.json"
 ITEMS = DATA / "council-items.json"
+COMMITTEE_ITEMS = DATA / "committee-items.json"
 DISCUSSIONS = DATA / "council-discussions.json"
 FEATURED = DATA / "featured.json"
 BYLAWS = DATA / "bylaws.json"
@@ -96,6 +97,7 @@ def verify(strict: bool = False) -> dict[str, Any]:
         "meetings": read_json(MEETINGS),
         "documents": read_json(DOCUMENTS),
         "items": read_json(ITEMS),
+        "committee_items": read_json(COMMITTEE_ITEMS),
         "discussions": read_json(DISCUSSIONS),
         "featured": read_json(FEATURED),
         "bylaws": read_json(BYLAWS),
@@ -105,6 +107,7 @@ def verify(strict: bool = False) -> dict[str, Any]:
         "meetings": MEETINGS,
         "documents": DOCUMENTS,
         "items": ITEMS,
+        "committee_items": COMMITTEE_ITEMS,
         "discussions": DISCUSSIONS,
     }
     for name, path in required.items():
@@ -114,6 +117,7 @@ def verify(strict: bool = False) -> dict[str, Any]:
     meetings = records(payloads["meetings"], "meetings")
     documents = records(payloads["documents"], "documents")
     items = records(payloads["items"], "items")
+    committee_items = records(payloads["committee_items"], "items")
     discussions = records(payloads["discussions"], "items")
     bylaws = records(payloads["bylaws"], "bylaws")
     featured = payloads["featured"] if isinstance(payloads["featured"], dict) else {}
@@ -262,6 +266,26 @@ def verify(strict: bool = False) -> dict[str, Any]:
     else:
         add(checks, "pass", "items-found", f"Extracted {len(items)} Council items.")
 
+    def committee_like(item: dict[str, Any]) -> bool:
+        explicit = str(item.get("meeting_group") or "").strip().lower()
+        if explicit in {"committee", "board", "commission", "panel"}:
+            return True
+        text = " ".join(str(item.get(key) or "") for key in ("meeting_title", "committee_name", "title")).lower()
+        return bool(re.search(r"committee|board|commission|panel|task force|working group|governance and priorities|finance and audit", text))
+
+    inferred_committee_items = [item for item in items if committee_like(item)]
+    if inferred_committee_items and not committee_items:
+        add(checks, "fail", "committee-dataset-empty", "Committee records exist in council-items.json but committee-items.json is empty.")
+    elif len(committee_items) != len(inferred_committee_items):
+        add(
+            checks,
+            "warn",
+            "committee-dataset-count",
+            f"Committee dataset has {len(committee_items)} items; combined Council data identifies {len(inferred_committee_items)}.",
+        )
+    else:
+        add(checks, "pass", "committee-dataset-count", f"Committee dataset contains {len(committee_items)} matching items.")
+
     item_ids = [item.get("id") for item in items if item.get("id")]
     duplicate_item_ids = [item_id for item_id, count in Counter(item_ids).items() if count > 1]
     if duplicate_item_ids:
@@ -393,6 +417,7 @@ def verify(strict: bool = False) -> dict[str, Any]:
             "downloaded_documents": len(downloaded),
             "text_documents": len(extracted),
             "items": len(items),
+            "committee_items": len(committee_items),
             "bylaw_items": len(bylaw_items),
             "matched_bylaw_items": len(matched_items),
             "discussions": len(discussions),

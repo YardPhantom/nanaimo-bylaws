@@ -25,17 +25,17 @@
   const meetingGroup = item => {
     const explicit = String(item?.meeting_group || "").toLowerCase();
     if (["committee", "board", "commission", "panel"].includes(explicit)) return "committee";
+    const title = `${item?.meeting_title || ""} ${item?.committee_name || ""} ${item?.title || ""}`.toLowerCase();
+    if (/committee|board|commission|panel|task force|working group|governance and priorities|finance and audit/.test(title)) return "committee";
     if (["council", "public-hearing"].includes(explicit)) return "council";
-    const title = String(item?.meeting_title || item?.title || "").toLowerCase();
-    return /committee|board|commission|panel|governance and priorities|finance and audit/.test(title)
-      ? "committee"
-      : "council";
+    return "council";
   };
 
   const meetingCount = payload => {
     const meetings = rowsFrom(payload, "meetings");
     const identities = new Set();
     for (const meeting of meetings) {
+      if (meetingGroup(meeting) !== "council") continue;
       const identity = String(
         meeting?.id || meeting?.meeting_id || meeting?.url || meeting?.source_url
         || `${meeting?.date || ""}|${meeting?.title || meeting?.name || ""}`
@@ -104,7 +104,7 @@
       text("stat-online", total);
       text("stat-connected", total);
       const connectedNote = document.querySelector("#stat-connected")?.parentElement?.querySelector("small");
-      if (connectedNote) connectedNote.textContent = `${total} records connected`;
+      if (connectedNote) connectedNote.textContent = `${total} records archived`;
     } else {
       setUnavailable(["data-total", "data-categories", "data-years", "stat-online", "stat-connected"]);
     }
@@ -118,9 +118,12 @@
     text("stat-repealed", (Number.isFinite(repealed) ? repealed : fallbackRepealed).toLocaleString());
 
     const allCouncilItems = rowsFrom(data.councilItems, "items");
-    const dedicatedCommitteeItems = data.committeeItems ? rowsFrom(data.committeeItems, "items") : null;
+    const dedicatedCommitteeItems = data.committeeItems
+      ? rowsFrom(data.committeeItems, "items").filter(item => meetingGroup(item) === "committee")
+      : [];
     const councilItems = allCouncilItems.filter(item => meetingGroup(item) === "council");
-    const committeeItems = dedicatedCommitteeItems || allCouncilItems.filter(item => meetingGroup(item) === "committee");
+    const inferredCommitteeItems = allCouncilItems.filter(item => meetingGroup(item) === "committee");
+    const committeeItems = dedicatedCommitteeItems.length ? dedicatedCommitteeItems : inferredCommitteeItems;
     text("stat-council-items", data.councilItems ? councilItems.length.toLocaleString() : "—");
     text("stat-committee-items", (data.committeeItems || data.councilItems) ? committeeItems.length.toLocaleString() : "—");
 

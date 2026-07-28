@@ -1,6 +1,6 @@
 # Nanaimo Bylaw Tracker — GitHub, Cloudflare R2 and Worker setup
 
-This keeps the authored website on IIS while moving runtime JSON, archived PDFs, extracted text, manifests, and collection work to Cloudflare. The R2 bucket stays private. A read-only Worker on a free `workers.dev` address serves the public files, and GitHub Actions runs the collectors.
+This keeps the authored website on IIS while moving runtime JSON, archived PDFs, extracted text, manifests, and collection work to Cloudflare. The R2 bucket stays private. A read-only Worker on a free `workers.dev` address serves the public files, and GitHub Actions runs the collectors. When configured, the same collection workflow also processes private Firestore subscription settings and sends matching alerts through Brevo.
 
 ## Final layout
 
@@ -27,6 +27,8 @@ Keep these names exact because the included workflows already expect them:
 | `R2_ACCESS_KEY_ID` | R2 API token result | Reads and writes bucket objects |
 | `R2_SECRET_ACCESS_KEY` | R2 API token result | Reads and writes bucket objects |
 | `R2_BUCKET_NAME` | Your chosen bucket name | Use `nanaimo-bylaw-data` |
+
+Email delivery also uses the secrets and variable documented in `SUBSCRIPTION_SETUP.md`. Configure those only after the data collector and Firebase sign-in are working.
 
 The Worker deployment token and R2 object credentials are separate. Do not interchange them.
 
@@ -177,7 +179,7 @@ From the extracted project folder:
 git init
 git branch -M main
 git add .
-git commit -m "Add Nanaimo Bylaw Tracker V0.13.1"
+git commit -m "Add Nanaimo Bylaw Tracker V0.13.2"
 git remote add origin https://github.com/YOUR-GITHUB-NAME/nanaimo-bylaw-tracker.git
 git push -u origin main
 ```
@@ -276,7 +278,7 @@ Preserve the configured `cloud-config.js` when applying future site ZIP upgrades
 ## 12. Run the first cloud collection
 
 1. In GitHub, open **Actions**.
-2. Select **Collect and publish Nanaimo data**.
+2. Select **Collect, publish and notify Nanaimo data**.
 3. Select **Run workflow → Run workflow**.
 4. Wait for every step to finish successfully.
 5. Open the uploaded diagnostic artifact only if a step fails or the counts look wrong.
@@ -291,7 +293,11 @@ Each collection run:
 4. downloads only new or confirmed-changed source documents;
 5. verifies archive uniqueness and Council data;
 6. uploads changed runtime files to R2;
-7. publishes collection status last.
+7. publishes collection status last;
+8. checks whether Firebase and Brevo secrets are complete;
+9. sends, tests, dry-runs, or skips subscription email according to the workflow mode.
+
+Email delivery is skipped with a warning until all required email secrets are configured. See `SUBSCRIPTION_SETUP.md` before enabling it.
 
 ## 13. Remove routine runtime storage from IIS
 

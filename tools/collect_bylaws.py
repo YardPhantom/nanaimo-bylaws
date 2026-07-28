@@ -546,7 +546,7 @@ def update_homepage_fallback(
         )
     html = re.sub(
         r'(<strong\s+id=["\']stat-connected["\'][^>]*>.*?</strong><b>records connected</b><small>).*?(</small>)',
-        rf'\g<1>{record_count:,} records loaded locally\g<2>',
+        rf'\g<1>{record_count:,} records archived\g<2>',
         html,
         count=1,
         flags=re.S,

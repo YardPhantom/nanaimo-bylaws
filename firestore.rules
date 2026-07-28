@@ -17,14 +17,30 @@ service cloud.firestore {
       allow read: if signedInAs(userId);
       allow create, update: if signedInAs(userId)
         && subscriptionId == "email"
-        && request.resource.data.keys().hasOnly(["active", "frequency", "changeTypes", "categories", "updatedAt"])
+        && request.resource.data.keys().hasOnly([
+          "active",
+          "frequency",
+          "changeTypes",
+          "categories",
+          "createdAt",
+          "activatedAt",
+          "updatedAt"
+        ])
         && request.resource.data.active is bool
         && request.resource.data.frequency in ["immediate", "daily", "weekly"]
         && request.resource.data.changeTypes is list
         && request.resource.data.changeTypes.size() <= 4
         && request.resource.data.categories is list
-        && request.resource.data.categories.size() <= 1;
+        && request.resource.data.categories.size() <= 1
+        && request.resource.data.updatedAt is timestamp
+        && (!("createdAt" in request.resource.data) || request.resource.data.createdAt is timestamp)
+        && (!("activatedAt" in request.resource.data) || request.resource.data.activatedAt is timestamp);
       allow delete: if signedInAs(userId);
+    }
+
+    // Delivery state is written only by the Firebase Admin service account.
+    match /subscriptionEmailDeliveries/{deliveryId} {
+      allow read, write: if false;
     }
 
     match /{document=**} {

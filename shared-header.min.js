@@ -40,7 +40,7 @@
       <header class="site-header mega-site-header">
         <div class="header-main-row">
           <a aria-label="Nanaimo Bylaw Tracker home" class="brand" href="${href('index.html')}">
-            <span aria-hidden="true" class="brand-mark"><img src="${href('assets/brand-icon.svg?v=0.13.1')}" alt="" width="64" height="64"></span>
+            <span aria-hidden="true" class="brand-mark"><img src="${href('assets/brand-icon.svg?v=0.13.2')}" alt="" width="64" height="64"></span>
             <span class="brand-copy"><span class="brand-title">Nanaimo Bylaw Tracker</span><small>Bylaws. Meetings. Accountability.</small></span>
           </a>
           <div class="header-actions" aria-label="Account and search shortcuts">
@@ -81,7 +81,7 @@
       const script = document.createElement('script');
       script.type = 'module';
       script.dataset.accountSession = 'true';
-      script.src = `${accountRoot}/account-session.min.js?v=0.13.1`.replace(/^\.\//, '');
+      script.src = `${accountRoot}/account-session.min.js?v=0.13.2`.replace(/^\.\//, '');
       document.head.appendChild(script);
     };
     const idleLoad = () => ('requestIdleCallback' in window)

@@ -1,5 +1,5 @@
 (() => {
-  const VERSION = "V0.13.1";
+  const VERSION = "V0.13.2";
   const targets = document.querySelectorAll("[data-shared-footer]");
 
   targets.forEach((target) => {
@@ -30,7 +30,7 @@
   });
   if ('serviceWorker' in navigator) {
     const root = targets[0] ? (targets[0].dataset.root || '.').replace(/\/$/, '') : '.';
-    const registerWorker = () => navigator.serviceWorker.register(`${root}/sw.js?v=0.13.1`.replace(/^\.\//, ''), { scope: `${root}/`.replace(/^\.\//, '') })
+    const registerWorker = () => navigator.serviceWorker.register(`${root}/sw.js?v=0.13.2`.replace(/^\.\//, ''), { scope: `${root}/`.replace(/^\.\//, '') })
       .catch(error => console.warn('[NBT] Service worker registration skipped', error));
     if ('requestIdleCallback' in window) window.requestIdleCallback(registerWorker, { timeout: 4000 });
     else window.setTimeout(registerWorker, 1800);

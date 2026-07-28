@@ -28,7 +28,7 @@ from botocore.config import Config
 from botocore.exceptions import ClientError
 
 ROOT = Path(__file__).resolve().parents[1]
-VERSION = "V0.13.1"
+VERSION = "V0.13.2"
 STATE_PREFIXES = ("data/", "archive/", "bylaws/pdf/", "council/")
 DATA_GLOBS = ("data/*.json",)
 ARCHIVE_GLOBS = ("archive/**/*", "bylaws/pdf/**/*", "council/**/*")
@@ -234,6 +234,8 @@ def build_status(manifest: dict, upload_counts: dict) -> dict:
     documents = rows_from(ROOT / "data" / "council-documents.json", "documents")
     items = rows_from(ROOT / "data" / "council-items.json", "items")
     committee_items = rows_from(ROOT / "data" / "committee-items.json", "items")
+    bylaw_change_events = rows_from(ROOT / "data" / "change-log.json", "events")
+    council_change_events = rows_from(ROOT / "data" / "council-change-log.json", "events")
     return {
         "schemaVersion": 1,
         "status": "ok",
@@ -248,6 +250,8 @@ def build_status(manifest: dict, upload_counts: dict) -> dict:
             "councilDocuments": len(documents),
             "councilItems": len(items),
             "committeeItems": len(committee_items),
+            "bylawChangeEvents": len(bylaw_change_events),
+            "councilChangeEvents": len(council_change_events),
             "archivePdfs": manifest["archivePdfCount"],
             "uniqueArchivePdfHashes": manifest["uniqueArchivePdfHashes"],
             "duplicateArchivePdfHashes": manifest["duplicateArchivePdfHashes"],
@@ -308,6 +312,8 @@ def verify(settings: Settings) -> None:
         "data/bylaws.json",
         "data/council-items.json",
         "data/committee-items.json",
+        "data/change-log.json",
+        "data/council-change-log.json",
         "archive-manifest.json",
         "collection-status.json",
     ]

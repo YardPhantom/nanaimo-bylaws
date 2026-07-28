@@ -2,10 +2,10 @@
 
 ## Current release
 
-- Version: **V0.13.1**
-- Next code change: **V0.13.2**
+- Version: **V0.13.2**
+- Next code change: **V0.13.3**
 - Deployment path: `C:\inetpub\wwwroot\sites\nanaimo`
-- Release ZIP: `nanaimo-bylaw-tracker-v0.13.1.zip`
+- Release ZIP: `nanaimo-bylaw-tracker-v0.13.2.zip`
 
 ## Purpose
 
@@ -29,15 +29,16 @@ Independent civic-information archive for publicly available City of Nanaimo byl
 - `shared-footer.js` / `shared-footer.min.js` inject the footer and visible version.
 - `tools/verify_shared_header.py` verifies one correctly rooted shared header per authored page.
 - Production pages use versioned minified CSS/JS, deferred scripts, IIS compression/caching, and `sw.js` static caching.
-- Runtime JSON is loaded through `cloud-data.js`; cloud mode uses the configured Worker and can fall back locally during migration.
+- Runtime JSON is loaded through `cloud-data.js`; production uses the configured Worker with local fallback disabled.
 - Readable source CSS/JS files remain in releases for maintenance.
 
 ## Cloud runtime architecture
 
-- `cloud-config.js` is deployment-specific. Cloud mode remains disabled until the final `workers.dev` URL is entered.
+- `cloud-config.js` is deployment-specific and currently enables `https://nanaimo-bylaw-data.yardplots.workers.dev` with local fallback disabled.
 - `cloud-data.js` / `cloud-data.min.js` provide one runtime URL and fetch layer across all pages.
 - `cloud/worker/` contains a read-only Worker bound to private R2 storage. It supports GET, HEAD, OPTIONS, CORS, PDF byte ranges, cache headers, and no directory listing.
 - `.github/workflows/cloud-collect.yml` runs the existing collectors at 6:17 a.m. and 6:17 p.m. America/Vancouver time and can also be run manually.
+- `.github/workflows/deploy-data-worker.yml` deploys through Node.js 24 and direct pinned Wrangler 4.114.0; `cloudflare/wrangler-action@v3` is intentionally not used because of its deprecated Node.js 20 action runtime.
 - `tools/cloud_sync.py` restores current R2 state, uploads changed objects by SHA-256, writes `archive-manifest.json`, publishes `collection-status.json` last, and never deletes historical archive objects.
 - `CLOUD_SETUP.md` is the authoritative activation and migration guide.
 - Once configured, preserve `cloud-config.js` during ordinary deployment upgrades.
@@ -77,11 +78,15 @@ Legacy Council-link repair:
 - Root `firebase-config.js` must export `firebaseConfig`; it is deployment-specific and excluded from releases.
 - Firestore stores private preferences, cloud watchlists, and one email-subscription document per UID.
 - `admin/index.html` is hidden from navigation and checks for `yardplots@gmail.com`. Public cloud JSON/PDF records remain intentionally readable; operational credentials and private account data must remain protected.
-- Brevo SMTP and Firebase Admin credentials remain server-side under `runtime` or another protected location.
+- Brevo SMTP and Firebase Admin credentials remain server-side or in GitHub Actions secrets.
+- Scheduled delivery runs after successful cloud collection and R2 verification.
+- Subscription documents contain preferences and activation timestamps only; the sender resolves the address from Firebase Authentication.
+- Delivery state uses a one-way recipient hash and event identifiers to suppress duplicates.
+- `SUBSCRIPTION_SETUP.md` is the source of truth for secrets, Firestore rules, test mode, dry-run mode, and activation.
 
 ```powershell
 .\tools\test-brevo-smtp.cmd recipient@example.com
-.\tools\send-subscription-updates.cmd
+.\tools\send-subscription-updates.cmd --dry-run
 ```
 
 ## Data and classification rules
@@ -134,16 +139,41 @@ Ordinary release ZIPs must not overwrite:
 - Added SHA-256-aware cloud pull, publish, verification, archive manifest, and collection status.
 - Converted all runtime data loaders, data links, extracted text, archive checks, and PDF viewing to the shared cloud-aware URL layer.
 - Added cloud status and manifest information to the admin dashboard.
-- Cloud mode is disabled until deployment credentials and the final Worker URL are configured.
+- Production cloud mode is active; IIS serves the authored site while Worker/R2 serves runtime data and archives.
 
 ## V0.13.1 same-version cloud deployment cleanup
 
 - GitHub collection and Worker workflows use current action majors on Ubuntu 24.04.
 - Collection fails fast when any required R2 secret is missing.
-- Worker CI uses `cloudflare/wrangler-action@v3` with Wrangler 4.114.0 pinned.
+- Worker CI uses Node.js 24 and direct pinned `npx wrangler@4.114.0 deploy`; `cloudflare/wrangler-action@v3` is not used.
 - `CLOUD_SETUP.md` contains the authoritative click-by-click order for creating the GitHub repository, private R2 bucket, R2 object credentials, Worker deployment token, GitHub secrets, final `workers.dev` URL, initial publish, and IIS activation. The account subdomain is configured before the first GitHub deploy.
-- The project version remains V0.13.1; the next code change remains V0.13.2.
+- The project version remained V0.13.1; the next versioned feature was V0.13.2.
 
 ## Next recommended work
 
-Follow `CLOUD_SETUP.md`: create the R2 bucket, deploy the Worker, upload the existing IIS collection once, configure the GitHub secrets, enable `cloud-config.js`, and manually run the first GitHub Actions collection.
+Confirm scheduled GitHub collections continue publishing fresh `collection-status.json` timestamps, preserve the active `cloud-config.js` during IIS upgrades, and use V0.13.3 for the next versioned feature release.
+
+### V0.13.1 same-version cloud response cleanup
+
+- `sw.js` clones cacheable responses synchronously before scheduling cache writes, avoiding consumed-body clone failures.
+- The R2 Worker passes range options only for actual `Range` requests; full JSON and file responses return HTTP 200, while PDF/browser byte-range requests continue returning HTTP 206.
+
+
+## V0.13.1 same-version civic count cleanup
+
+- Homepage bylaw, Council-item, committee-item, and Council-document datasets are each fetched once and shared by all homepage counters.
+- `Council activity` now displays Council/public-hearing items only, matching the dashboard Council card.
+- Its document count now includes unique Council/public-hearing source documents only.
+- `Council meetings indexed` excludes committee, board, commission, and panel meetings.
+- Committee activity continues to use the dedicated committee dataset with the combined dataset as a fallback.
+- Updated the service worker to purge the prior same-version static cache and revalidate authored assets before using offline cache fallback.
+
+## V0.13.2 subscription delivery
+
+- Connected subscription delivery to the cloud collection workflow.
+- Added Brevo test, dry-run, send, and skip workflow modes.
+- Fixed Firestore field validation so subscription settings can save under the supplied rules.
+- Removed duplicate recipient-email storage from subscription documents.
+- Added activation timestamps, historical-event suppression, per-recipient deduplication, category/type filtering, and daily/weekly accumulation.
+- Added private aggregate delivery diagnostics and complete setup documentation.
+- Next code change: V0.13.3.

@@ -56,6 +56,7 @@ function countCouncilMeetings(payload){
     :(Array.isArray(payload?.meetings)?payload.meetings:[]);
   const seen=new Set();
   for(const meeting of meetings){
+    if(civicMeetingGroup(meeting)!=='council')continue;
     const identity=String(
       meeting?.id
       ||meeting?.meeting_id
@@ -189,14 +190,19 @@ document.querySelectorAll('.table-sort').forEach(button=>button.addEventListener
   }
   renderRecentChanges();
 }));
-NanaimoData.fetch(DATA_URL,{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error(`HTTP ${r.status}`);return r.json()}).then(data=>{
+const bylawDataPromise=NanaimoData.fetch(DATA_URL,{cache:'no-store'}).then(response=>{
+  if(!response.ok)throw new Error(`HTTP ${response.status}`);
+  return response.json();
+});
+
+bylawDataPromise.then(data=>{
   all=(Array.isArray(data)?data:(Array.isArray(data.bylaws)?data.bylaws:[])).map(normalizeBylawRecord);console.info('[Nanaimo Bylaw Tracker] loaded',all.length,'records from',DATA_URL);
   buildFilterMenus();
   Object.entries({online:all.length,connected:all.length}).forEach(([key,value])=>{
     const el=document.querySelector(`#stat-${key}`);
     if(el)el.textContent=value.toLocaleString();
   });
-  const connectedSmall=document.querySelector('#stat-connected')?.parentElement?.querySelector('small');if(connectedSmall)connectedSmall.textContent=`${all.length.toLocaleString()} records connected`;
+  const connectedSmall=document.querySelector('#stat-connected')?.parentElement?.querySelector('small');if(connectedSmall)connectedSmall.textContent=`${all.length.toLocaleString()} records archived`;
   const updated=document.querySelector('#dataset-updated');const generated=data?.metadata?.generated_at||data?.metadata?.generated||'';if(updated)updated.textContent=generated?`Dataset updated: ${generated}`:`Current dataset: ${all.length.toLocaleString()} records`;
   const categoryCounts=all.reduce((counts,bylaw)=>{const category=bylaw.category||'Other';counts[category]=(counts[category]||0)+1;return counts;},{});
   document.querySelectorAll('.category-grid [data-category]').forEach(card=>{const category=card.dataset.category,count=categoryCounts[category]||0,countNode=card.querySelector('.category-count');if(countNode)countNode.textContent=count;card.setAttribute('aria-label',`${category}: ${count} ${count===1?'bylaw':'bylaws'}`)});
@@ -232,37 +238,60 @@ NanaimoData.fetch(`data/bylaws-summary.json?v=${Date.now()}`,{cache:'no-store'})
 function civicMeetingGroup(item={}){
   const explicit=String(item.meeting_group||'').toLowerCase();
   if(explicit==='committee'||explicit==='board'||explicit==='commission'||explicit==='panel')return 'committee';
+  const title=`${item.meeting_title||''} ${item.committee_name||''} ${item.title||''}`.toLowerCase();
+  if(/committee|board|commission|panel|task force|working group|governance and priorities|finance and audit/.test(title))return 'committee';
   if(explicit==='council'||explicit==='public-hearing')return 'council';
-  const title=String(item.meeting_title||item.title||'').toLowerCase();
-  if(/committee|board|commission|panel|governance and priorities|finance and audit/.test(title))return 'committee';
   return 'council';
 }
 
-Promise.allSettled([
+function civicItemRows(payload){
+  return Array.isArray(payload)
+    ?payload
+    :(Array.isArray(payload?.items)?payload.items:[]);
+}
+
+const meetingActivityPromise=Promise.allSettled([
   NanaimoData.fetch(COUNCIL_ITEMS_URL,{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error(`Council items HTTP ${r.status}`);return r.json()}),
   NanaimoData.fetch(COMMITTEE_ITEMS_URL,{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error(`Committee items HTTP ${r.status}`);return r.json()}),
 ]).then(([councilResult,committeeResult])=>{
-  const all=councilResult.status==='fulfilled'?(Array.isArray(councilResult.value)?councilResult.value:(councilResult.value.items||[])):[];
-  const dedicated=committeeResult.status==='fulfilled'?(Array.isArray(committeeResult.value)?committeeResult.value:(committeeResult.value.items||[])):null;
-  const committeeItems=dedicated||all.filter(item=>civicMeetingGroup(item)==='committee');
-  const councilItems=all.filter(item=>civicMeetingGroup(item)==='council');
+  const councilAvailable=councilResult.status==='fulfilled';
+  const dedicatedCommitteeAvailable=committeeResult.status==='fulfilled';
+  const allItems=councilAvailable?civicItemRows(councilResult.value):[];
+  const councilItems=allItems.filter(item=>civicMeetingGroup(item)==='council');
+  const inferredCommitteeItems=allItems.filter(item=>civicMeetingGroup(item)==='committee');
+  const dedicatedCommitteeItems=dedicatedCommitteeAvailable
+    ?civicItemRows(committeeResult.value).filter(item=>civicMeetingGroup(item)==='committee')
+    :[];
+  const committeeItems=dedicatedCommitteeItems.length?dedicatedCommitteeItems:inferredCommitteeItems;
+
+  if(!councilAvailable)console.error('[Nanaimo Bylaw Tracker] Council item count failed',councilResult.reason);
+  if(!dedicatedCommitteeItems.length&&councilAvailable){
+    console.warn('[Nanaimo Bylaw Tracker] Dedicated committee dataset unavailable or empty; using Council dataset fallback.',committeeResult.status==='rejected'?committeeResult.reason:'No committee rows');
+  }
+
+  return {
+    councilItems,
+    committeeItems,
+    councilAvailable,
+    committeeAvailable:dedicatedCommitteeItems.length>0||councilAvailable,
+  };
+});
+
+meetingActivityPromise.then(activity=>{
   const councilTarget=document.querySelector('#stat-council-items');
   const committeeTarget=document.querySelector('#stat-committee-items');
-  if(councilTarget)councilTarget.textContent=councilItems.length.toLocaleString();
-  if(committeeTarget)committeeTarget.textContent=committeeItems.length.toLocaleString();
-  if(councilResult.status==='rejected')console.error('[Nanaimo Bylaw Tracker] Council item count failed',councilResult.reason);
-  if(committeeResult.status==='rejected')console.warn('[Nanaimo Bylaw Tracker] Dedicated committee dataset unavailable; using Council dataset fallback.',committeeResult.reason);
+  if(councilTarget)councilTarget.textContent=activity.councilAvailable?activity.councilItems.length.toLocaleString():'—';
+  if(committeeTarget)committeeTarget.textContent=activity.committeeAvailable?activity.committeeItems.length.toLocaleString():'—';
+});
+
+const councilDocumentsPromise=NanaimoData.fetch(COUNCIL_DOCUMENTS_URL,{cache:'no-store'}).then(response=>{
+  if(!response.ok)throw new Error(`Council documents HTTP ${response.status}`);
+  return response.json();
 });
 
 Promise.allSettled([
-  NanaimoData.fetch(COUNCIL_DOCUMENTS_URL,{cache:'no-store'}).then(response=>{
-    if(!response.ok)throw new Error(`Council documents HTTP ${response.status}`);
-    return response.json();
-  }),
-  NanaimoData.fetch(DATA_URL,{cache:'no-store'}).then(response=>{
-    if(!response.ok)throw new Error(`Bylaws HTTP ${response.status}`);
-    return response.json();
-  })
+  councilDocumentsPromise,
+  bylawDataPromise
 ]).then(([councilResult,bylawResult])=>{
   const paths=new Set();
   if(councilResult.status==='fulfilled'){
@@ -379,21 +408,23 @@ NanaimoData.fetch(COUNCIL_DISCUSSIONS_URL,{cache:'no-store'})
   });
 
 
-Promise.all([
-  NanaimoData.fetch(COUNCIL_ITEMS_URL,{cache:'no-store'}).then(response=>response.ok?response.json():({items:[]})),
-  NanaimoData.fetch(COUNCIL_DOCUMENTS_URL,{cache:'no-store'}).then(response=>response.ok?response.json():({documents:[]}))
-]).then(([itemData,documentData])=>{
-  const items=Array.isArray(itemData)?itemData:(itemData.items||[]);
-  const documents=Array.isArray(documentData)?documentData:(documentData.documents||[]);
+Promise.allSettled([
+  meetingActivityPromise,
+  councilDocumentsPromise
+]).then(([activityResult,documentResult])=>{
+  const activity=activityResult.status==='fulfilled'?activityResult.value:null;
+  const councilDocuments=documentResult.status==='fulfilled'
+    ?councilDocumentsFrom(documentResult.value).filter(document=>civicMeetingGroup(document)==='council')
+    :[];
+  const itemText=activity?.councilAvailable?activity.councilItems.length.toLocaleString():'—';
+  const documentText=documentResult.status==='fulfilled'?countEscribeDocumentRecords(councilDocuments).toLocaleString():'—';
   const badge=document.querySelector('#council-pdf-count');
   if(badge){
-    badge.textContent=`${items.length.toLocaleString()} items · ${documents.length.toLocaleString()} documents`;
-    badge.setAttribute('aria-label',`${items.length.toLocaleString()} detected Council items and ${documents.length.toLocaleString()} indexed source documents`);
+    badge.textContent=`${itemText} items · ${documentText} documents`;
+    badge.setAttribute('aria-label',`${itemText} Council items and ${documentText} Council source documents`);
   }
-}).catch(error=>{
-  console.error('[Nanaimo Bylaw Tracker] Council activity counts failed',error);
-  const badge=document.querySelector('#council-pdf-count');
-  if(badge)badge.textContent='Council counts unavailable';
+  if(activityResult.status==='rejected')console.error('[Nanaimo Bylaw Tracker] Council activity count failed',activityResult.reason);
+  if(documentResult.status==='rejected')console.error('[Nanaimo Bylaw Tracker] Council document count failed',documentResult.reason);
 });
 
 
@@ -483,17 +514,21 @@ function renderLatestCommitteeActivity(items=[]){
   const list=document.querySelector('#latest-committee-list');
   const total=document.querySelector('#committee-activity-count');
   if(!list||!total)return;
-  const rows=items.filter(item=>civicMeetingGroup(item)==='committee')
+  const committeeItems=items.filter(item=>civicMeetingGroup(item)==='committee');
+  const rows=[...committeeItems]
     .sort((a,b)=>String(b.date||'').localeCompare(String(a.date||'')))
     .slice(0,6);
-  total.textContent=`${items.filter(item=>civicMeetingGroup(item)==='committee').length.toLocaleString()} items`;
+  total.textContent=`${committeeItems.length.toLocaleString()} items`;
   list.innerHTML=rows.length?rows.map(item=>{
     const local=committeeLocalPdf(item.local_document);
     const href=item.bylaw_detail_url?item.bylaw_detail_url:(local?committeeViewerUrl(local,item):'committees/index.html');
     return `<article class="latest-council-item"><div class="council-item-meta"><span class="status amended">${esc(committeeDecisionLabel(item))}</span><span>${esc(item.date||'Date unavailable')}</span></div><h3><a href="${esc(href)}">${esc(item.title||'Committee item')}</a></h3><p>${esc(item.meeting_title||'Committee, board or panel')}</p></article>`;
   }).join(''):'<p class="empty-state">No committee or panel items have been collected yet.</p>';
 }
-NanaimoData.fetch(COMMITTEE_ITEMS_URL,{cache:'no-store'}).then(r=>r.ok?r.json():Promise.reject(new Error(`HTTP ${r.status}`))).catch(()=>NanaimoData.fetch(COUNCIL_ITEMS_URL,{cache:'no-store'}).then(r=>r.ok?r.json():Promise.reject(new Error(`HTTP ${r.status}`)))).then(data=>renderLatestCommitteeActivity(Array.isArray(data)?data:(data.items||[]))).catch(()=>{
+meetingActivityPromise.then(activity=>{
+  if(!activity.committeeAvailable)throw new Error('Committee activity unavailable');
+  renderLatestCommitteeActivity(activity.committeeItems);
+}).catch(()=>{
   const list=document.querySelector('#latest-committee-list'); const total=document.querySelector('#committee-activity-count');
   if(list)list.innerHTML='<p class="empty-state">Committee activity is unavailable until the Council collector runs.</p>';
   if(total)total.textContent='Unavailable';
