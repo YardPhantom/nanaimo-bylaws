@@ -37,7 +37,6 @@ Independent civic-information archive for publicly available City of Nanaimo byl
 - `cloud-config.js` is deployment-specific and currently enables `https://nanaimo-bylaw-data.yardplots.workers.dev` with local fallback disabled.
 - `cloud-data.js` / `cloud-data.min.js` provide one runtime URL and fetch layer across all pages.
 - `cloud/worker/` contains a read-only Worker bound to private R2 storage. It supports GET, HEAD, OPTIONS, CORS, PDF byte ranges, cache headers, and no directory listing.
-- `.github/workflows/cloud-collect.yml` runs the existing collectors at 6:17 a.m. and 6:17 p.m. America/Vancouver time and can also be run manually.
 - `.github/workflows/deploy-data-worker.yml` deploys through Node.js 24 and direct pinned Wrangler 4.114.0; `cloudflare/wrangler-action@v3` is intentionally not used because of its deprecated Node.js 20 action runtime.
 - `tools/cloud_sync.py` restores current R2 state, uploads changed objects by SHA-256, writes `archive-manifest.json`, publishes `collection-status.json` last, and never deletes historical archive objects.
 - `CLOUD_SETUP.md` is the authoritative activation and migration guide.

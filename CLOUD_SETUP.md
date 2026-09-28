@@ -1,6 +1,6 @@
 # Nanaimo Bylaw Tracker — GitHub, Cloudflare R2 and Worker setup
 
-This keeps the authored website on IIS while moving runtime JSON, archived PDFs, extracted text, manifests, and collection work to Cloudflare. The R2 bucket stays private. A read-only Worker on a free `workers.dev` address serves the public files, and GitHub Actions runs the collectors. When configured, the same collection workflow also processes private Firestore subscription settings and sends matching alerts through Brevo.
+This keeps the authored website on IIS while moving runtime JSON, archived PDFs, extracted text, manifests, and collection work to Cloudflare. The R2 bucket stays private. A read-only Worker on a free `workers.dev` address serves the public files; the collectors themselves are run locally with the tools in `tools/`. When configured, `tools/send_subscription_updates.py` processes private Firestore subscription settings and sends matching alerts through Brevo.
 
 ## Final layout
 
@@ -18,7 +18,7 @@ Browser using the IIS website
 
 ## Values you will create
 
-Keep these names exact because the included workflows already expect them:
+Keep these names exact because the included Worker workflow and local tools already expect them:
 
 | GitHub secret | Where it comes from | Purpose |
 |---|---|---|
@@ -275,33 +275,31 @@ Keep `localFallback: true` during migration. Then verify:
 
 Preserve the configured `cloud-config.js` when applying future site ZIP upgrades.
 
-## 12. Run the first cloud collection
+## 12. Run a cloud collection
 
-1. In GitHub, open **Actions**.
-2. Select **Collect, publish and notify Nanaimo data**.
-3. Select **Run workflow → Run workflow**.
-4. Wait for every step to finish successfully.
-5. Open the uploaded diagnostic artifact only if a step fails or the counts look wrong.
+```powershell
+.\tools\cloud-pull.cmd
+.\tools\collect-all.cmd
+.\tools\cloud-publish.cmd
+```
 
-The schedule runs at **6:17 a.m. and 6:17 p.m. America/Vancouver time**. GitHub handles daylight-saving changes because the workflow uses the IANA timezone directly.
-
-Each collection run:
+Each run:
 
 1. restores the current R2 state;
-2. runs the existing bylaw and civic collectors;
-3. reuses archived PDFs and extracts missing text locally in the runner;
-4. downloads only new or confirmed-changed source documents;
-5. verifies archive uniqueness and Council data;
-6. uploads changed runtime files to R2;
-7. publishes collection status last;
-8. checks whether Firebase and Brevo secrets are complete;
-9. sends, tests, dry-runs, or skips subscription email according to the workflow mode.
+2. runs the existing bylaw and civic collectors, reusing archived PDFs and extracting missing text locally;
+3. downloads only new or confirmed-changed source documents;
+4. verifies archive uniqueness and Council data;
+5. uploads changed runtime files to R2 and publishes collection status last.
 
-Email delivery is skipped with a warning until all required email secrets are configured. See `SUBSCRIPTION_SETUP.md` before enabling it.
+Once `SUBSCRIPTION_SETUP.md` secrets are configured, send subscriber updates afterward:
+
+```powershell
+.\tools\send-subscription-updates.cmd
+```
 
 ## 13. Remove routine runtime storage from IIS
 
-Only after at least one successful scheduled run and a complete site check:
+Only after at least one successful cloud collection and a complete site check:
 
 1. Back up the existing IIS runtime data.
 2. Change `localFallback` to `false` in `cloud-config.js`.

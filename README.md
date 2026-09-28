@@ -18,10 +18,9 @@ V0.13.2 uses cloud runtime storage in production. IIS serves HTML, CSS, JavaScri
 
 ### Cloud collection — recommended
 
-GitHub Actions restores the previous collection state from R2, runs the same collectors, verifies the result, and uploads only changed objects.
+Restores the previous collection state from R2, runs the same collectors, verifies the result, and uploads only changed objects.
 
 ```text
-.github/workflows/cloud-collect.yml
 cloud/worker/
 tools/cloud_sync.py
 ```

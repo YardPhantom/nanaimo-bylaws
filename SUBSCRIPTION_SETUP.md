@@ -1,12 +1,12 @@
 # Nanaimo Bylaw Tracker — Email subscription setup
 
-V0.13.2 processes private Firestore subscription settings after each cloud collection and sends matching updates through Brevo SMTP. The collection workflow continues normally when email credentials are not configured; it reports a warning and skips delivery.
+V0.13.2 processes private Firestore subscription settings and sends matching updates through Brevo SMTP after a cloud collection. Run `tools/send_subscription_updates.py` (or `tools\send-subscription-updates.cmd`) to deliver updates; it requires the email credentials documented below.
 
 ## How delivery works
 
 1. A signed-in user saves one subscription document under their Firebase UID.
 2. The browser stores only alert preferences and timestamps. It does not duplicate the Google email address in Firestore.
-3. GitHub Actions restores and refreshes the cloud datasets.
+3. A cloud collection (see `CLOUD_SETUP.md`) refreshes the datasets.
 4. The trusted Firebase Admin sender resolves active users' email addresses from Firebase Authentication.
 5. New matching bylaw and Council events are sent through Brevo.
 6. Firestore stores private delivery state using a one-way email hash and event identifiers so the same alert is not sent twice.
@@ -97,31 +97,13 @@ npx firebase-tools deploy --only firestore:rules
 
 Confirm the exact Firebase project ID before publishing rules.
 
-## Test before enabling normal delivery
-
-After pushing V0.13.2 to GitHub:
-
-1. Open **Actions → Collect, publish and notify Nanaimo data**.
-2. Select **Run workflow**.
-3. Choose `test` for **Subscription email action after collection**.
-4. Confirm the workflow is green.
-5. Confirm the test message arrived at `SUBSCRIPTION_TEST_RECIPIENT`.
-
-Test mode verifies Firebase Admin access, reads active subscription counts, sends only to the private test recipient, and does not change subscriber delivery history.
-
-Next run the workflow with `dry-run`. The diagnostic artifact includes `subscription-delivery-status.json` with aggregate counts only. It does not contain subscriber email addresses.
-
-Finally run with `send`. Scheduled collections then use `send` automatically.
-
-## Schedule and frequency behavior
-
-The collector runs at 6:17 a.m. and 6:17 p.m. America/Vancouver time.
+## Frequency behavior
 
 - **As changes are detected:** sends after the next successful collection containing a matching new event.
 - **Daily digest:** accumulates changes and sends on the evening collection after the configured local send hour.
 - **Weekly digest:** accumulates changes and sends on Monday's evening collection by default.
 
-The workflow caps one run at 100 recipient messages and 50 displayed items per message. Unsent pending items remain eligible for a later run.
+The sender caps one run at 100 recipient messages and 50 displayed items per message (`MAX_EMAILS_PER_RUN`, `MAX_EVENTS_PER_EMAIL`). Unsent pending items remain eligible for a later run.
 
 ## Local emergency test
 
