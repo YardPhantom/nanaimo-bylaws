@@ -55,3 +55,7 @@ The unlinked `admin/index.html` page is restricted in the browser to `yardplots@
 - `SUBSCRIPTION_SETUP.md` — Firebase and Brevo email delivery setup
 - `NANAIMO_BYLAW_TRACKER_COMPACT_HANDOFF.md` — continuation rules
 - `NANAIMO_BYLAW_TRACKER_V0.13.2_SUMMARY.md` — release changes
+
+---
+
+Built by [Trevor Heshka](https://trevorheshka.com).
