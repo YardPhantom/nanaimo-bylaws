@@ -1,5 +1,9 @@
 # Nanaimo Bylaw Tracker — V0.13.2
 
+![Screenshot of the home page](docs/screenshot.png)
+
+*Headless screenshot of `index.html` served locally (no live data backend; counts reflect bundled/empty local data).*
+
 Independent civic-information archive for publicly available City of Nanaimo bylaws, Council records, and committee, board, commission, and panel activity.
 
 ## Deployment
