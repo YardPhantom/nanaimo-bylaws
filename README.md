@@ -63,3 +63,11 @@ The unlinked `admin/index.html` page is restricted in the browser to `yardplots@
 ---
 
 Built by [Trevor Heshka](https://trevorheshka.com).
+
+---
+
+## Live app & author
+
+- **Live:** [Nanaimo Bylaw Tracker](https://trevorheshka.com/nanaimo/)
+- Built by [Trevor Heshka](https://trevorheshka.com/about/) · [Hesh Co.](https://trevorheshka.com/services/), Nanaimo, BC
+- More projects: https://trevorheshka.com/projects/
